@@ -56,7 +56,7 @@ namespace JojaExpress
                 i %= forSale.Count;
                 if (i == currentItemIndex) return;
 
-                if(forSale[i].DisplayName.Contains(searchBox.Text))
+                if(forSale[i].DisplayName.Contains(searchBox.Text, StringComparison.CurrentCultureIgnoreCase))
                 {
                     currentItemIndex = i;
                     ModEntry._Helper.Reflection.GetMethod(this, "setScrollBarToCurrentIndex").Invoke();
@@ -75,7 +75,7 @@ namespace JojaExpress
                 if (i < 0) i = forSale.Count - 1;
                 if (i == currentItemIndex) return;
 
-                if (forSale[i].DisplayName.Contains(searchBox.Text))
+                if (forSale[i].DisplayName.Contains(searchBox.Text, StringComparison.CurrentCultureIgnoreCase))
                 {
                     currentItemIndex = i;
                     ModEntry._Helper.Reflection.GetMethod(this, "setScrollBarToCurrentIndex").Invoke();
