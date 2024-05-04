@@ -4,6 +4,7 @@ using StardewValley.GameData;
 using StardewValley;
 using System.Globalization;
 using StardewValley.GameData.Objects;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace JojaExpress
 {
@@ -124,6 +125,10 @@ namespace JojaExpress
                     };
                     objects.Add("ofts.jojaExp.item.jpad", data3);
                 });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("JojaExp/assets/JPad"))
+            {
+                e.LoadFromModFile<Texture2D>("assets/Jpad", AssetLoadPriority.Low);
             }
         }
 
