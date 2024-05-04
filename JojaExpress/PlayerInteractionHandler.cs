@@ -100,7 +100,7 @@ namespace JojaExpress
                 openMenu();
                 return;
             }
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady || Game1.activeClickableMenu != null) return;
             bool found = false;
             foreach (InputButton key in Game1.options.actionButton)
             {
