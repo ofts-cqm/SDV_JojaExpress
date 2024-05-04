@@ -50,6 +50,13 @@ namespace JojaExpress
                     sid0.PriceModifierMode = QuantityModifier.QuantityModifierMode.Maximum;
                     shop.Items.Add(sid0);
                     data.Add("ofts.JojaExp.jojaGlobal", shop);
+
+                    data["Joja"].Items.Add(new ShopItemData() { 
+                        ItemId = "(O)ofts.jojaExp.item.jpad",
+                        Id = "ofts.jojaExp.paditem",
+                        IgnoreShopPriceModifiers = false,
+                        PriceModifiers = new() { }
+                    });
                 });
             }
             else if (e.NameWithoutLocale.IsEquivalentTo("Data/mail"))
@@ -107,7 +114,7 @@ namespace JojaExpress
                         Description = "[LocalizedText JojaExp\\string:descrip_jpad]",
                         Type = "Basic",
                         Category = -999,
-                        Price = 0,
+                        Price = 10000,
                         Texture = "JojaExp/assets/JPad",
                         SpriteIndex = 0,
                         IsDrink = false,
