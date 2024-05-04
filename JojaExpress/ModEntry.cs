@@ -5,6 +5,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley.Menus;
 using Microsoft.Xna.Framework.Graphics;
 using GenericModConfigMenu;
+using StardewValley.Objects;
 
 namespace JojaExpress
 {
@@ -43,6 +44,7 @@ namespace JojaExpress
             GUI.birdTexture = Helper.GameContent.Load<Texture2D>("LooseSprites\\parrots");
             _Helper = helper;
             _Monitor = Monitor;
+            Phone.PhoneHandlers.Add(new JojaPhoneHandler());
         }
 
         public override object? GetApi()
@@ -100,6 +102,30 @@ namespace JojaExpress
                 tooltip: () => Helper.Translation.Get("fee_Member_tip"),
                 min: 0,
                 formatValue: (value) => (value - 1).ToString("P1")
+            );
+
+            configMenu.AddBoolOption(
+                mod:ModManifest,
+                getValue: () => config.OpenByKey,
+                setValue: value => config.OpenByKey = value,
+                name: () => Helper.Translation.Get("openByKey"),
+                tooltip: () => Helper.Translation.Get("openByKey_tooltip")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.OpenByPad,
+                setValue: value => config.OpenByPad = value,
+                name: () => Helper.Translation.Get("openByPad"),
+                tooltip: () => Helper.Translation.Get("openByPad_tooltip")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.OpenByPhone,
+                setValue: value => config.OpenByPhone = value,
+                name: () => Helper.Translation.Get("openByPhone"),
+                tooltip: () => Helper.Translation.Get("openByPhone_tooltip")
             );
         }
 
@@ -219,5 +245,8 @@ namespace JojaExpress
         public float CarriageFee { get; set; } = 1.3f;
         public float CarriageFee_NoJoja { get; set; } = 1.5f;
         public float CarriageFee_Member { get; set; } = 1.1f;
+        public bool OpenByPhone { get; set; } = true;
+        public bool OpenByKey { get; set; } = false;
+        public bool OpenByPad { get; set; } = true;
     }
 }

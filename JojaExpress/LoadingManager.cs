@@ -19,7 +19,9 @@ namespace JojaExpress
                     {
                         { "display", ModEntry._Helper.Translation.Get("item.package.display") },
                         { "descrip_global", ModEntry._Helper.Translation.Get("item.package.descrip.global") },
-                        { "descrip_local", ModEntry._Helper.Translation.Get("item.package.descrip.local") }
+                        { "descrip_local", ModEntry._Helper.Translation.Get("item.package.descrip.local") },
+                        { "descrip_jpad", ModEntry._Helper.Translation.Get("item.jpad.descrip") },
+                        { "jpad", ModEntry._Helper.Translation.Get("item.jpad") }
                     };
                 }, AssetLoadPriority.Medium);
             }
@@ -82,20 +84,38 @@ namespace JojaExpress
                         ExcludeFromShippingCollection = true
                     };
                     objects.Add("ofts.jojaExp.item.package.global", data);
-                    ObjectData data2 = new();
-                    data2.Name = "jojaExp.localPackage";
-                    data2.DisplayName = "[LocalizedText JojaExp\\string:display]";
-                    data2.Description = "[LocalizedText JojaExp\\string:descrip_local]";
-                    data2.Type = "Basic";
-                    data2.Category = -999;
-                    data2.Price = 0;
-                    data2.Texture = "LooseSprites/Giftbox";
-                    data2.SpriteIndex = 11;
-                    data2.IsDrink = false;
-                    data2.ExcludeFromFishingCollection = true;
-                    data2.ExcludeFromRandomSale = true;
-                    data2.ExcludeFromShippingCollection = true;
+                    ObjectData data2 = new()
+                    {
+                        Name = "jojaExp.localPackage",
+                        DisplayName = "[LocalizedText JojaExp\\string:display]",
+                        Description = "[LocalizedText JojaExp\\string:descrip_local]",
+                        Type = "Basic",
+                        Category = -999,
+                        Price = 0,
+                        Texture = "LooseSprites/Giftbox",
+                        SpriteIndex = 11,
+                        IsDrink = false,
+                        ExcludeFromFishingCollection = true,
+                        ExcludeFromRandomSale = true,
+                        ExcludeFromShippingCollection = true
+                    };
                     objects.Add("ofts.jojaExp.item.package.local", data2);
+                    ObjectData data3 = new()
+                    {
+                        Name = "jojaExp.jpad",
+                        DisplayName = "[LocalizedText JojaExp\\string:jpad]",
+                        Description = "[LocalizedText JojaExp\\string:descrip_jpad]",
+                        Type = "Basic",
+                        Category = -999,
+                        Price = 0,
+                        Texture = "JojaExp/assets/JPad",
+                        SpriteIndex = 0,
+                        IsDrink = false,
+                        ExcludeFromFishingCollection = true,
+                        ExcludeFromRandomSale = true,
+                        ExcludeFromShippingCollection = true
+                    };
+                    objects.Add("ofts.jojaExp.item.jpad", data3);
                 });
             }
         }

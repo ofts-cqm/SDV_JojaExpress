@@ -95,7 +95,9 @@ namespace JojaExpress
 
         public static void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
-            if (ModEntry.config != null && ModEntry.config.Open.JustPressed() && DataLoader.Shops(Game1.content).ContainsKey("ofts.JojaExp.jojaLocal") && Context.IsWorldReady && Game1.activeClickableMenu == null)
+            if (ModEntry.config != null && ModEntry.config.Open.JustPressed() && ModEntry.config.OpenByKey && 
+                DataLoader.Shops(Game1.content).ContainsKey("ofts.JojaExp.jojaLocal") && 
+                Context.IsWorldReady && Game1.activeClickableMenu == null)
             {
                 openMenu();
                 return;
@@ -127,6 +129,13 @@ namespace JojaExpress
                     }
                 }
                 Game1.player.reduceActiveItemByOne();
+            }
+            else if (Game1.player.ActiveObject != null && ModEntry.config != null && ModEntry.config.OpenByPad &&
+                Game1.player.ActiveObject.QualifiedItemId == "(O)ofts.jojaExp.item.jpad" && 
+                DataLoader.Shops(Game1.content).ContainsKey("ofts.JojaExp.jojaLocal") && 
+                Context.IsWorldReady && Game1.activeClickableMenu == null)
+            {
+                openMenu();
             }
         }
     }
