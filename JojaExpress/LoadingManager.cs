@@ -207,6 +207,7 @@ namespace JojaExpress
                     }
                 }
                 if (jojaLocal == null) throw new Exception("failed to find jojalocal market");
+                
                 items.Sort((a, b) =>
                 {
                     return string.Compare(ItemRegistry.GetMetadata(a.ItemId).GetParsedData().DisplayName,
