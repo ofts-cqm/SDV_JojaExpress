@@ -55,7 +55,7 @@ namespace JojaExpress
         public static void openMenu()
         {
             List<KeyValuePair<string, string>> responses = new();
-            if (ModEntry.fee_state != 1)
+            if (!(ModEntry.fee_state == 1 && ModEntry.config.CloseWhenCCComplete))
                 responses.Add(new KeyValuePair<string, string>("local", ModEntry._Helper.Translation.Get("local")));
             responses.Add(new KeyValuePair<string, string>("global", ModEntry._Helper.Translation.Get("global")));
             responses.Add(new KeyValuePair<string, string>("qi", ModEntry._Helper.Translation.Get("qi")));

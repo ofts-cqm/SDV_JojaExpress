@@ -2,7 +2,6 @@
 using StardewModdingAPI;
 using StardewValley;
 using StardewModdingAPI.Utilities;
-using StardewValley.Menus;
 using Microsoft.Xna.Framework.Graphics;
 using GenericModConfigMenu;
 using StardewValley.Objects;
@@ -126,6 +125,14 @@ namespace JojaExpress
                 name: () => Helper.Translation.Get("openByPhone"),
                 tooltip: () => Helper.Translation.Get("openByPhone_tooltip")
             );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.CloseWhenCCComplete,
+                setValue: value => config.CloseWhenCCComplete = value,
+                name: () => Helper.Translation.Get("CloseWhenCCComplete"),
+                tooltip: () => Helper.Translation.Get("CloseWhenCCComplete")
+            );
         }
 
         public void receiveMultiplayerMessage(object? sender, ModMessageReceivedEventArgs e)
@@ -247,5 +254,6 @@ namespace JojaExpress
         public bool OpenByPhone { get; set; } = true;
         public bool OpenByKey { get; set; } = false;
         public bool OpenByPad { get; set; } = true;
+        public bool CloseWhenCCComplete { get; set; } = true;
     }
 }
