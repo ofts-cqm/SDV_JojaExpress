@@ -198,8 +198,17 @@ namespace JojaExpress
                             if (item.PriceModifiers != null) item.PriceModifiers.AddRange(modifiers);
                             else item.PriceModifiers = modifiers;
                         }
-                        items.Add(item);
-                        ids.Add(item.ItemId);
+                        try
+                        {
+                            var a = ItemRegistry.GetMetadata(item.ItemId).GetParsedData().DisplayName;
+                            items.Add(item);
+                            ids.Add(item.ItemId);
+                        }catch (Exception ex)
+                        {
+                            ModEntry._Monitor.Log($"Failed to add {item.ItemId} to Joja Community. " +
+                                $"Technical details: {ex.Message}. " +
+                                $"Joja Express already handled this exception. Your game will still run normally");
+                        }
                     }
                     if (modifiers != null && modifiers.Count != 0)
                     {
