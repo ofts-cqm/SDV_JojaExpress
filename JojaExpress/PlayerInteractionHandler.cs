@@ -112,6 +112,14 @@ namespace JojaExpress
                     break;
                 }
             }
+            foreach (InputButton key in Game1.options.useToolButton)
+            {
+                if (e.IsDown(key.ToSButton()))
+                {
+                    found = true;
+                    break;
+                }
+            }
             if (!found) return;
             if (Game1.player.ActiveObject != null && (
                 Game1.player.ActiveObject.QualifiedItemId == "(O)ofts.jojaExp.item.package.global" ||
@@ -130,8 +138,8 @@ namespace JojaExpress
                 }
                 Game1.player.reduceActiveItemByOne();
             }
-            else if (Game1.player.ActiveObject != null && ModEntry.config != null && ModEntry.config.OpenByPad &&
-                Game1.player.ActiveObject.QualifiedItemId == "(O)ofts.jojaExp.item.jpad" && 
+            else if (Game1.player.ActiveItem != null && ModEntry.config != null && ModEntry.config.OpenByPad &&
+                Game1.player.ActiveItem.QualifiedItemId == "(T)ofts.jojaExp.item.jpad" && 
                 DataLoader.Shops(Game1.content).ContainsKey("ofts.JojaExp.jojaLocal") && 
                 Context.IsWorldReady && Game1.activeClickableMenu == null)
             {

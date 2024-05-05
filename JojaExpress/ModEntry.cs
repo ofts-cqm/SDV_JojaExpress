@@ -21,7 +21,6 @@ namespace JojaExpress
         public static ModEntry Instance;
         public static IModHelper _Helper;
         public static IMonitor _Monitor;
-        public static NamingMenu m;
 
         public override void Entry(IModHelper helper)
         {

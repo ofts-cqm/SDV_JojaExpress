@@ -5,6 +5,7 @@ using StardewValley;
 using System.Globalization;
 using StardewValley.GameData.Objects;
 using Microsoft.Xna.Framework.Graphics;
+using StardewValley.GameData.Tools;
 
 namespace JojaExpress
 {
@@ -53,7 +54,7 @@ namespace JojaExpress
                     data.Add("ofts.JojaExp.jojaGlobal", shop);
 
                     data["Joja"].Items.Add(new ShopItemData() { 
-                        ItemId = "(O)ofts.jojaExp.item.jpad",
+                        ItemId = "(T)ofts.jojaExp.item.jpad",
                         Id = "ofts.jojaExp.paditem",
                         IgnoreShopPriceModifiers = false,
                         PriceModifiers = new() { }
@@ -108,27 +109,38 @@ namespace JojaExpress
                         ExcludeFromShippingCollection = true
                     };
                     objects.Add("ofts.jojaExp.item.package.local", data2);
-                    ObjectData data3 = new()
-                    {
-                        Name = "jojaExp.jpad",
-                        DisplayName = "[LocalizedText JojaExp\\string:jpad]",
-                        Description = "[LocalizedText JojaExp\\string:descrip_jpad]",
-                        Type = "Basic",
-                        Category = -999,
-                        Price = 10000,
-                        Texture = "JojaExp/assets/JPad",
-                        SpriteIndex = 0,
-                        IsDrink = false,
-                        ExcludeFromFishingCollection = true,
-                        ExcludeFromRandomSale = true,
-                        ExcludeFromShippingCollection = true
-                    };
-                    objects.Add("ofts.jojaExp.item.jpad", data3);
                 });
             }
             else if (e.NameWithoutLocale.IsEquivalentTo("JojaExp/assets/JPad"))
             {
                 e.LoadFromModFile<Texture2D>("assets/Jpad", AssetLoadPriority.Low);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Tools"))
+            {
+                e.Edit(asset => {
+                    IDictionary<string, ToolData> data = asset.AsDictionary<string, ToolData>().Data;
+                    ToolData data3 = new()
+                    {
+                        ClassName = "GenericTool",
+                        Name = "jojaExp.jpad",
+                        DisplayName = "[LocalizedText JojaExp\\string:jpad]",
+                        Description = "[LocalizedText JojaExp\\string:descrip_jpad]",
+                        Texture = "JojaExp/assets/JPad",
+                        SpriteIndex = 1,
+                        SalePrice = 10000,
+                        MenuSpriteIndex = 0,
+                        UpgradeLevel = -1,
+                        ApplyUpgradeLevelToDisplayName = false,
+                        CanBeLostOnDeath = true,
+                        AttachmentSlots = -1,
+                        ConventionalUpgradeFrom = "",
+                        UpgradeFrom = new(),
+                        SetProperties = new(),
+                        ModData = new(),
+                        CustomFields = new()
+                    };
+                    data.Add("ofts.jojaExp.item.jpad", data3);
+                });
             }
         }
 
