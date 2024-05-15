@@ -131,7 +131,7 @@ namespace JojaExpress
                     {
                         for (int cnt = int.Parse(p.Value.Value); cnt > 0; cnt -= 999)
                         {
-                            Game1.currentLocation.debris.Add(Game1.createItemDebris(ItemRegistry.Create(p.Key, cnt % 999), Game1.player.Position, 0));
+                            Game1.currentLocation.debris.Add(Game1.createItemDebris(ItemRegistry.Create(p.Key, Math.Min(cnt, 999)), Game1.player.Position, 0));
                         }
                     }
                     catch (Exception ex)
