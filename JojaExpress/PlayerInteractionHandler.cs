@@ -55,10 +55,17 @@ namespace JojaExpress
         public static void openMenu()
         {
             List<KeyValuePair<string, string>> responses = new();
-            if (!(ModEntry.fee_state == 1 && ModEntry.config.CloseWhenCCComplete))
+            if (!(ModEntry.fee_state == 1 && ModEntry.config.CloseWhenCCComplete) && ModEntry.config.EnableCommunity)
                 responses.Add(new KeyValuePair<string, string>("local", ModEntry._Helper.Translation.Get("local")));
-            responses.Add(new KeyValuePair<string, string>("global", ModEntry._Helper.Translation.Get("global")));
-            responses.Add(new KeyValuePair<string, string>("qi", ModEntry._Helper.Translation.Get("qi")));
+            if (ModEntry.config.EnableGlobal)
+                responses.Add(new KeyValuePair<string, string>("global", ModEntry._Helper.Translation.Get("global")));
+            if (ModEntry.config.EnableQi)
+                responses.Add(new KeyValuePair<string, string>("qi", ModEntry._Helper.Translation.Get("qi")));
+            if (responses.Count == 0)
+            {
+                Game1.multipleDialogues(ModEntry._Helper.Translation.Get("sorry").ToString().Split('$'));
+                return;
+            }
             responses.Add(new KeyValuePair<string, string>("help", ModEntry._Helper.Translation.Get("help")));
             Game1.currentLocation.ShowPagedResponses(ModEntry._Helper.Translation.Get("prompt"), responses, delegate (string callId)
             {

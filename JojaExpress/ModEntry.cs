@@ -133,6 +133,30 @@ namespace JojaExpress
                 name: () => Helper.Translation.Get("CloseWhenCCComplete"),
                 tooltip: () => Helper.Translation.Get("CloseWhenCCComplete")
             );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.EnableCommunity,
+                setValue: value => config.EnableCommunity = value,
+                name: () => Helper.Translation.Get("enablec"),
+                tooltip: () => Helper.Translation.Get("enablec")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.EnableGlobal,
+                setValue: value => config.EnableGlobal = value,
+                name: () => Helper.Translation.Get("enableg"),
+                tooltip: () => Helper.Translation.Get("enableg")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.EnableQi,
+                setValue: value => config.EnableQi = value,
+                name: () => Helper.Translation.Get("enableq"),
+                tooltip: () => Helper.Translation.Get("enableq")
+            );
         }
 
         public void receiveMultiplayerMessage(object? sender, ModMessageReceivedEventArgs e)
@@ -255,5 +279,8 @@ namespace JojaExpress
         public bool OpenByKey { get; set; } = false;
         public bool OpenByPad { get; set; } = true;
         public bool CloseWhenCCComplete { get; set; } = true;
+        public bool EnableCommunity { get; set;} = true;
+        public bool EnableGlobal { get; set; } = true;
+        public bool EnableQi { get; set; } = true;
     }
 }
