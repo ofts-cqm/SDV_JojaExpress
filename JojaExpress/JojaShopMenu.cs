@@ -22,6 +22,7 @@ namespace JojaExpress
         public JojaShopMenu(string shopId, ShopData shopData, ShopOwnerData ownerData, Func<ISalable, Farmer, int, bool> onPurchase, Func<ISalable, string> getPostfix)
             : base(shopId, shopData, ownerData, onPurchase: onPurchase)
         {
+            exitFunction = PlayerInteractionHandler.exitMenu;
             this.getPostfix = getPostfix;
             tmp = ModEntry._Helper.ModContent.Load<Texture2D>("assets/Search");
             searchTexture = new ClickableTextureComponent(

@@ -6,11 +6,117 @@ using System.Globalization;
 using StardewValley.GameData.Objects;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley.GameData.Tools;
+using GenericModConfigMenu;
+using StardewModdingAPI;
 
 namespace JojaExpress
 {
     public class LoadingManager
     {
+        public static void loadModConfigMenu(IGenericModConfigMenuApi configMenu, ModConfig config, IManifest ModManifest, IModHelper Helper)
+        {
+            // register mod
+            configMenu.Register(
+                mod: ModManifest,
+                reset: () => config = new ModConfig(),
+                save: () => Helper.WriteConfig(config)
+            );
+
+            configMenu.AddKeybindList(
+                mod: ModManifest,
+                getValue: () => config.Open,
+                setValue: value => config.Open = value,
+                name: () => Helper.Translation.Get("open_name"),
+                tooltip: () => Helper.Translation.Get("open_tip")
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => config.CarriageFee,
+                setValue: value => config.CarriageFee = value,
+                name: () => Helper.Translation.Get("fee_name"),
+                tooltip: () => Helper.Translation.Get("fee_tip"),
+                min: 0,
+                formatValue: (value) => (value - 1).ToString("P1")
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => config.CarriageFee_NoJoja,
+                setValue: value => config.CarriageFee_NoJoja = value,
+                name: () => Helper.Translation.Get("fee_NoJoja_name"),
+                tooltip: () => Helper.Translation.Get("fee_NoJoja_tip"),
+                min: 0,
+                formatValue: (value) => (value - 1).ToString("P1")
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => config.CarriageFee_Member,
+                setValue: value => config.CarriageFee_Member = value,
+                name: () => Helper.Translation.Get("fee_Member_name"),
+                tooltip: () => Helper.Translation.Get("fee_Member_tip"),
+                min: 0,
+                formatValue: (value) => (value - 1).ToString("P1")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.OpenByKey,
+                setValue: value => config.OpenByKey = value,
+                name: () => Helper.Translation.Get("openByKey"),
+                tooltip: () => Helper.Translation.Get("openByKey_tooltip")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.OpenByPad,
+                setValue: value => config.OpenByPad = value,
+                name: () => Helper.Translation.Get("openByPad"),
+                tooltip: () => Helper.Translation.Get("openByPad_tooltip")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.OpenByPhone,
+                setValue: value => config.OpenByPhone = value,
+                name: () => Helper.Translation.Get("openByPhone"),
+                tooltip: () => Helper.Translation.Get("openByPhone_tooltip")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.CloseWhenCCComplete,
+                setValue: value => config.CloseWhenCCComplete = value,
+                name: () => Helper.Translation.Get("CloseWhenCCComplete"),
+                tooltip: () => Helper.Translation.Get("CloseWhenCCComplete")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.EnableCommunity,
+                setValue: value => config.EnableCommunity = value,
+                name: () => Helper.Translation.Get("enablec"),
+                tooltip: () => Helper.Translation.Get("enablec")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.EnableGlobal,
+                setValue: value => config.EnableGlobal = value,
+                name: () => Helper.Translation.Get("enableg"),
+                tooltip: () => Helper.Translation.Get("enableg")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.EnableQi,
+                setValue: value => config.EnableQi = value,
+                name: () => Helper.Translation.Get("enableq"),
+                tooltip: () => Helper.Translation.Get("enableq")
+            );
+        }
+
         public static void loadAsset(object? sender, AssetRequestedEventArgs e)
         {
             if (e.Name.IsEquivalentTo("JojaExp\\string"))

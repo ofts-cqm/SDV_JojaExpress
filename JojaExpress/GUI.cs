@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using Microsoft.Xna.Framework;
+using StardewValley.Menus;
 
 namespace JojaExpress
 {
@@ -21,6 +22,7 @@ namespace JojaExpress
         public static PerScreen<bool> showAnimation = new(), droped = new();
         public static PerScreen<Vector2> target = new(), current = new();
         public static PerScreen<GameLocation> targetLocation = new();
+        public static PerScreen<bool> needToCheckDialogueBox = new();
 
         public static void openMenu(string shopId, Func<ISalable, Farmer, int, bool> onPurchase, Func<ISalable, string> getPostFix)
         {
@@ -100,6 +102,11 @@ namespace JojaExpress
             if (e.OldMenu is JojaShopMenu shop && shop.ShopId == "ofts.JojaExp.jojaLocal" && ModEntry.localReceived.Count > 0)
             {
                 sendPackage(Game1.player);
+            }
+            if (e.OldMenu is DialogueBox && PlayerInteractionHandler.Api.GetRunningApp() == "Joja Express" && needToCheckDialogueBox.Value)
+            {
+                PlayerInteractionHandler.exitMenu();
+                needToCheckDialogueBox.Value = false;
             }
         }
 

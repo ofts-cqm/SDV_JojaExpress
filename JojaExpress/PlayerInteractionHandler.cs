@@ -1,13 +1,18 @@
 ﻿using Netcode;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
+using System.Collections.Generic;
 
 namespace JojaExpress
 {
     public class PlayerInteractionHandler
     {
+        public static IMobilePhoneApi Api;
+        public static PerScreen<bool> isAppRunning = new();
+
         public static void checkInv(object? sender, InventoryChangedEventArgs args)
         {
             foreach (Item item in args.Added)
@@ -22,6 +27,15 @@ namespace JojaExpress
                     if (!Context.IsMainPlayer) ModEntry._Helper.Multiplayer.SendMessage(1, "ofts.jojaExp.tobeReceivedPoped");
                 }
             }
+        }
+
+        public static void handlePhone()
+        {
+            if (Api == null || Api.IsCallingNPC() || Api.GetAppRunning()) return;
+            Api.SetAppRunning(true);
+            Api.SetRunningApp("Joja Express");
+            openMenu();
+            isAppRunning.Value = true;
         }
 
         public static void sendMail(object? sender, DayEndingEventArgs e)
@@ -64,9 +78,13 @@ namespace JojaExpress
             if (responses.Count == 0)
             {
                 Game1.multipleDialogues(ModEntry._Helper.Translation.Get("sorry").ToString().Split('$'));
+                Game1.delayedActions.Add(
+                    new DelayedAction(20, () => { GUI.needToCheckDialogueBox.Value = true; })
+                    );
                 return;
             }
             responses.Add(new KeyValuePair<string, string>("help", ModEntry._Helper.Translation.Get("help")));
+            responses.Add(new KeyValuePair<string, string>("__cancel", Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel")));
             Game1.currentLocation.ShowPagedResponses(ModEntry._Helper.Translation.Get("prompt"), responses, delegate (string callId)
             {
                 switch (callId)
@@ -84,7 +102,10 @@ namespace JojaExpress
                         }
                     case "qi":
                         {
-                            Utility.TryOpenShopMenu("QiGemShop", "AnyOrNone");
+                            if(Utility.TryOpenShopMenu("QiGemShop", "AnyOrNone"))
+                            {
+                                Game1.activeClickableMenu.exitFunction = exitMenu;
+                            }
                             break;
                         }
                     case "help":
@@ -94,10 +115,28 @@ namespace JojaExpress
                                     "info", new { percent = (ModEntry.getPriceModifier() - 1).ToString("P1") }
                                 ).ToString().Split('$')
                             );
+                            Game1.delayedActions.Add(
+                                new DelayedAction(20, () => { GUI.needToCheckDialogueBox.Value = true; })
+                                );
+                            break;
+                        }
+                    case "__cancel":
+                        {
+                            ModEntry._Monitor.Log("calcel!!!", LogLevel.Info);
+                            exitMenu();
                             break;
                         }
                 }
-            });
+            }, false, false);
+        }
+
+        public static void exitMenu()
+        {
+            if(isAppRunning.Value)
+            {
+                Api.SetAppRunning(false);
+                isAppRunning.Value = false;
+            }
         }
 
         public static void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
