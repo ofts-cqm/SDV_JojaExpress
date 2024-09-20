@@ -4,7 +4,6 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
-using System.Collections.Generic;
 
 namespace JojaExpress
 {
@@ -34,6 +33,17 @@ namespace JojaExpress
             if (Api == null || Api.IsCallingNPC() || Api.GetAppRunning()) return;
             Api.SetAppRunning(true);
             Api.SetRunningApp("Joja Express");
+            MobilePhoneRender.setBG("question");
+            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 32, 60, 250, 120, Game1.dialogueFont));
+            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
+            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 35, 255, 210, 60, null, true));
+            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 35, 306, 210, 60, null, true));
+            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 35, 363, 210, 60, null, true));
+            MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 55, 35, 150, 190, Game1.dialogueFont));
+            MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 230, 50, 210, 60, null, true));
+            MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 230, 101, 210, 60, null, true));
+            MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 230, 152, 210, 60, null, true));
+            MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 230, 203, 210, 60, null, true));
             openMenu();
             isAppRunning.Value = true;
         }

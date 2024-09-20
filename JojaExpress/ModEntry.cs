@@ -34,8 +34,16 @@ namespace JojaExpress
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.Player.InventoryChanged += PlayerInteractionHandler.checkInv;
             helper.Events.Multiplayer.ModMessageReceived += receiveMultiplayerMessage;
+            helper.Events.Display.RenderingActiveMenu += MobilePhoneRender.render;
             helper.Events.Display.MenuChanged += GUI.checkUI;
             helper.Events.Display.RenderedWorld += GUI.drawBird;
+            helper.Events.Content.LocaleChanged += (o, e) => {
+                MobilePhoneRender.splitBySpace =
+                e.NewLanguage != LocalizedContentManager.LanguageCode.ja &&
+                e.NewLanguage != LocalizedContentManager.LanguageCode.zh &&
+                e.NewLanguage != LocalizedContentManager.LanguageCode.ko;
+                
+            };
             config = this.Helper.ReadConfig<ModConfig>();
             Instance = this;
             postfix = Helper.Translation.Get("postfix");
@@ -64,6 +72,7 @@ namespace JojaExpress
                 bool success = mobileMenu.AddApp(Helper.ModRegistry.ModID, "Joja Express", PlayerInteractionHandler.handlePhone, appIcon);
                 Monitor.Log($"loaded phone app successfully: {success}", LogLevel.Info);
                 PlayerInteractionHandler.Api = mobileMenu;
+                MobilePhoneRender.init(mobileMenu);
             }
         }
 

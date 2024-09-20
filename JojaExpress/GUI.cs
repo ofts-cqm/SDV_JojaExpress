@@ -103,7 +103,7 @@ namespace JojaExpress
             {
                 sendPackage(Game1.player);
             }
-            if (e.OldMenu is DialogueBox && PlayerInteractionHandler.Api.GetRunningApp() == "Joja Express" && needToCheckDialogueBox.Value)
+            if (PlayerInteractionHandler.Api != null && e.OldMenu is DialogueBox && PlayerInteractionHandler.Api.GetRunningApp() == "Joja Express" && needToCheckDialogueBox.Value)
             {
                 PlayerInteractionHandler.exitMenu();
                 needToCheckDialogueBox.Value = false;
