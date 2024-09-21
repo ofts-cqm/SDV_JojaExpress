@@ -34,7 +34,7 @@ namespace JojaExpress
             Api.SetAppRunning(true);
             Api.SetRunningApp("Joja Express");
             MobilePhoneRender.setBG("question");
-            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 32, 60, 250, 120, Game1.dialogueFont));
+            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 30, 60, 250, 120, Game1.dialogueFont));
             MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
             MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 35, 255, 210, 60, null, true));
             MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 35, 306, 210, 60, null, true));
@@ -91,6 +91,7 @@ namespace JojaExpress
                 Game1.delayedActions.Add(
                     new DelayedAction(20, () => { GUI.needToCheckDialogueBox.Value = true; })
                     );
+                handleNoteDisplay();
                 return;
             }
             responses.Add(new KeyValuePair<string, string>("help", ModEntry._Helper.Translation.Get("help")));
@@ -128,6 +129,7 @@ namespace JojaExpress
                             Game1.delayedActions.Add(
                                 new DelayedAction(20, () => { GUI.needToCheckDialogueBox.Value = true; })
                                 );
+                            handleNoteDisplay();
                             break;
                         }
                     case "__cancel":
@@ -140,12 +142,26 @@ namespace JojaExpress
             }, false, false);
         }
 
+        public static void handleNoteDisplay()
+        {
+            if (isAppRunning.Value && Game1.activeClickableMenu is DialogueBox dialogue)
+            {
+                MobilePhoneRender.setBG("dialogue");
+                MobilePhoneRender.protrait.Clear();
+                MobilePhoneRender.landscape.Clear();
+                MobilePhoneRender.protrait.Add(new VolatileRenderPack(dialogue.getCurrentString, 25, 40, 240, 400, null));
+                MobilePhoneRender.landscape.Add(new VolatileRenderPack(dialogue.getCurrentString, 25, 40, 400, 240, null));
+            }
+        }
+
         public static void exitMenu()
         {
             if(isAppRunning.Value)
             {
                 Api.SetAppRunning(false);
                 isAppRunning.Value = false;
+                MobilePhoneRender.protrait.Clear();
+                MobilePhoneRender.landscape.Clear();
             }
         }
 
