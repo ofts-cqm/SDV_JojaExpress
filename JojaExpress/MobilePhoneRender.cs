@@ -25,6 +25,7 @@ namespace JojaExpress
 
         public static void setBG(string id)
         {
+            if (MobilePhoneRender.Api == null) return;
             if (bgID == id) return;
             bgID = id;
             background = helper.Load<Texture2D>($"assets/background_{id}_{(Api.GetPhoneRotated() ? "landscape" : "protrait")}");
@@ -77,12 +78,16 @@ namespace JojaExpress
                 string appended = currentStr + newStr[i];
                 if (splitBySpace) appended += " ";
                 Vector2 measured = font.MeasureString(appended);
+                Vector2 position = new Vector2(rec.X + (middle ? (rec.Width - lastWidth) / 2 : 0), ypos);
                 // 如果Y超了，罢工不画了
-                if (measured.Y + ypos > rec.Y + rec.Height) return;
+                if (measured.Y + ypos > rec.Y + rec.Height)
+                {
+                    //b.DrawString(font, currentStr, position, Color.White);
+                    return;
+                }
                 // 如果X超了，换行
                 if (measured.X > rec.Width)
                 {
-                    Vector2 position = new Vector2(rec.X + (middle ? (rec.Width - lastWidth) / 2 : 0), ypos);
                     b.DrawString(font, currentStr, position, Color.White);
                     ypos += (int)measured.Y;
                     currentStr = "";
@@ -92,8 +97,13 @@ namespace JojaExpress
                 lastWidth = measured.X;
             }
             // 最后画一下还没画好的
+            Vector2 measured2 = font.MeasureString(currentStr);
             Vector2 position2 = new Vector2(rec.X + (middle ? (rec.Width - lastWidth) / 2 : 0), ypos);
-            b.DrawString(font, currentStr, position2, Color.White);
+            // 如果Y超了，罢工不画了
+            if (measured2.Y + ypos <= rec.Y + rec.Height && measured2.X <= rec.Width)
+            {
+                b.DrawString(font, currentStr, position2, Color.White);
+            }
         }
     }
 }

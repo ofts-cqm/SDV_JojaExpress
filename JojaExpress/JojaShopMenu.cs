@@ -46,6 +46,28 @@ namespace JojaExpress
             nextButton.bounds = new(
                 xPositionOnScreen + 4 + 132, yPositionOnScreen + height - inventory.height + 44 * 4,
                 nextButton.bounds.Width, nextButton.bounds.Height);
+
+            MobilePhoneRender.setBG("shop");
+            MobilePhoneRender.protrait.Clear();
+            MobilePhoneRender.landscape.Clear();
+
+            List<Func<ISalable>> funcs = new(4)
+            {
+                () => forSale[currentItemIndex],
+                () => forSale[currentItemIndex + 1],
+                () => forSale[currentItemIndex + 2],
+                () => forSale[currentItemIndex + 3]
+            };
+            Func<ISalable, string> postfixOnPhone = shopId == "ofts.JojaExp.jojaLocal" ? GUI.getPostFixForLocalItemOnPhone : GUI.getPostFixForItemOnPhone;
+            for (int i = 0; i < 4; i++)
+            {
+                MobilePhoneRender.protrait.Add(new TexturedRenderPack(funcs[i], 35 - 16, 61 + 100 * i - 16, 0.5f));
+                MobilePhoneRender.protrait.Add(new VolatileRenderPack(funcs[i], 35, 100 + 100 * i, 220, 55, Game1.dialogueFont));
+                MobilePhoneRender.protrait.Add(new VolatileRenderPack(postfixOnPhone, funcs[i], 200, 65 + 100 * i, 100, 50, null));
+                MobilePhoneRender.landscape.Add(new TexturedRenderPack(funcs[i], 64 - 16, 38 + 59 * i - 16, 0.5f));
+                MobilePhoneRender.landscape.Add(new VolatileRenderPack(funcs[i], 100, 38 + 59 * i, 290, 55, Game1.dialogueFont));
+                MobilePhoneRender.landscape.Add(new VolatileRenderPack(postfixOnPhone, funcs[i], 390, 38 + 59 * i, 100, 50, null));
+            }
         }
 
         public void nextMatch(TextBox sender)
@@ -145,7 +167,7 @@ namespace JojaExpress
             TemporaryAnimatedSpriteList animations = getValue<TemporaryAnimatedSpriteList>("animations");
             TemporaryAnimatedSprite poof = getValue<TemporaryAnimatedSprite>("poof");
 
-            if (!Game1.options.showMenuBackground && !Game1.options.showClearBackgrounds)
+            if (!Game1.options.showMenuBackground && !Game1.options.showClearBackgrounds && MobilePhoneRender.Api == null)
             {
                 b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.75f);
             }

@@ -50,6 +50,20 @@ namespace JojaExpress
             else return "";
         }
 
+        public static string getPostFixForItemOnPhone(ISalable item)
+        {
+            if (ModEntry.tobeReceived.Last().TryGetValue(item.QualifiedItemId, out int amt))
+                return "x" + amt;
+            else return "x 0";
+        }
+
+        public static string getPostFixForLocalItemOnPhone(ISalable item)
+        {
+            if (ModEntry.localReceived.TryGetValue(item.QualifiedItemId, out int amt))
+                return "x" + amt;
+            else return "x 0";
+        }
+
         public static void dropPackage(SpriteBatch b)
         {
             tick++;

@@ -150,7 +150,7 @@ namespace JojaExpress
                 MobilePhoneRender.protrait.Clear();
                 MobilePhoneRender.landscape.Clear();
                 MobilePhoneRender.protrait.Add(new VolatileRenderPack(dialogue.getCurrentString, 25, 40, 240, 400, null));
-                MobilePhoneRender.landscape.Add(new VolatileRenderPack(dialogue.getCurrentString, 25, 40, 400, 240, null));
+                MobilePhoneRender.landscape.Add(new VolatileRenderPack(dialogue.getCurrentString, 40, 25, 400, 240, null));
             }
         }
 
