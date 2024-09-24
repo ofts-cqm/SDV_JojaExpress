@@ -2,13 +2,12 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewValley;
 
 namespace JojaExpress
 {
     internal class MobilePhoneRender
     {
-        public static Texture2D background;
+        public static Texture2D background, frame;
         public static string bgID = "";
         public static IMobilePhoneApi Api;
         public static IModContentHelper helper;
@@ -21,20 +20,46 @@ namespace JojaExpress
             MobilePhoneRender.Api = Api;
             helper = ModEntry._Helper.ModContent;
             background = helper.Load<Texture2D>("assets/background_dialogue_protrait");
+            frame = helper.Load<Texture2D>("assets/JPad_frame");
         }
 
         public static void setBG(string id)
         {
-            if (MobilePhoneRender.Api == null) return;
             if (bgID == id) return;
             bgID = id;
-            background = helper.Load<Texture2D>($"assets/background_{id}_{(Api.GetPhoneRotated() ? "landscape" : "protrait")}");
             protrait.Clear();
             landscape.Clear();
+
+            if (PlayerInteractionHandler.isJPadRunning.Value)
+            {
+                background = helper.Load<Texture2D>($"assets/background_{id}_landscape");
+            }
+            else if (Api != null)
+            {
+                background = helper.Load<Texture2D>($"assets/background_{id}_{(Api.GetPhoneRotated() ? "landscape" : "protrait")}");
+            }
+        }
+
+        public static void JPadRender(SpriteBatch sb)
+        {
+            Rectangle rec = new Rectangle(43, 47, 503, 286);
+            sb.Draw(frame, rec, Color.White);
+            sb.Draw(background, rec, Color.White);
+
+            foreach (IRenderPack pack in landscape)
+            {
+                pack.draw(sb, 43, 47);
+            }
         }
 
         public static void render(object? sender, RenderingActiveMenuEventArgs e)
         {
+            if (PlayerInteractionHandler.isJPadRunning.Value) 
+            {
+                JPadRender(e.SpriteBatch);
+                return; 
+            }
+
             if (Api == null || !PlayerInteractionHandler.isAppRunning.Value) return;
 
             if(Api.GetPhoneRotated() != old_rotated){

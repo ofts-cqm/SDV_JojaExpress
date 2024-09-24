@@ -10,7 +10,7 @@ namespace JojaExpress
     public class PlayerInteractionHandler
     {
         public static IMobilePhoneApi Api;
-        public static PerScreen<bool> isAppRunning = new();
+        public static PerScreen<bool> isAppRunning = new(), isJPadRunning = new();
 
         public static void checkInv(object? sender, InventoryChangedEventArgs args)
         {
@@ -144,7 +144,7 @@ namespace JojaExpress
 
         public static void handleHelpDisplay()
         {
-            if(Api != null && isAppRunning.Value)
+            if((Api != null && isAppRunning.Value) || isJPadRunning.Value)
             {
                 MobilePhoneRender.protrait.Clear();
                 MobilePhoneRender.landscape.Clear();
@@ -195,7 +195,7 @@ namespace JojaExpress
 
         public static void handleNoteDisplay()
         {
-            if (isAppRunning.Value && Game1.activeClickableMenu is DialogueBox dialogue)
+            if ((isJPadRunning.Value || isAppRunning.Value) && Game1.activeClickableMenu is DialogueBox dialogue)
             {
                 MobilePhoneRender.setBG("dialogue");
                 MobilePhoneRender.protrait.Clear();
@@ -211,6 +211,12 @@ namespace JojaExpress
             {
                 Api.SetAppRunning(false);
                 isAppRunning.Value = false;
+                MobilePhoneRender.protrait.Clear();
+                MobilePhoneRender.landscape.Clear();
+            }
+            else if (isJPadRunning.Value)
+            {
+                isJPadRunning.Value = false;
                 MobilePhoneRender.protrait.Clear();
                 MobilePhoneRender.landscape.Clear();
             }
@@ -269,6 +275,18 @@ namespace JojaExpress
                 DataLoader.Shops(Game1.content).ContainsKey("ofts.JojaExp.jojaLocal") && 
                 Context.IsWorldReady && Game1.activeClickableMenu == null)
             {
+                isJPadRunning.Value = true;
+                MobilePhoneRender.setBG("question");
+                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 30, 60, 250, 120, Game1.dialogueFont));
+                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
+                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 35, 255, 210, 60, null, true));
+                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 35, 306, 210, 60, null, true));
+                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 35, 363, 210, 60, null, true));
+                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 55, 35, 150, 190, Game1.dialogueFont));
+                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 230, 50, 210, 60, null, true));
+                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 230, 101, 210, 60, null, true));
+                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 230, 152, 210, 60, null, true));
+                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 230, 203, 210, 60, null, true));
                 openMenu();
             }
         }

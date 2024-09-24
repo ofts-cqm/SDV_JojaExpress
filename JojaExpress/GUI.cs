@@ -124,6 +124,13 @@ namespace JojaExpress
                 needToCheckDialogueBox.Value = false;
                 returnToHelpPage.Value = false;
             }
+            else if (PlayerInteractionHandler.isJPadRunning.Value && needToCheckDialogueBox.Value)
+            {
+                if (returnToHelpPage.Value) PlayerInteractionHandler.handleHelpDisplay();
+                else PlayerInteractionHandler.exitMenu();
+                needToCheckDialogueBox.Value = false;
+                returnToHelpPage.Value = false;
+            }
         }
 
         public static void sendPackage(Farmer who)
