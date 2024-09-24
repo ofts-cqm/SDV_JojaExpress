@@ -121,7 +121,7 @@ namespace JojaExpress
                         }
                     case "help":
                         {
-                            Game1.multipleDialogues(
+                            /*Game1.multipleDialogues(
                                 ModEntry._Helper.Translation.Get(
                                     "info", new { percent = (ModEntry.getPriceModifier() - 1).ToString("P1") }
                                 ).ToString().Split('$')
@@ -129,16 +129,67 @@ namespace JojaExpress
                             Game1.delayedActions.Add(
                                 new DelayedAction(20, () => { GUI.needToCheckDialogueBox.Value = true; })
                                 );
-                            handleNoteDisplay();
+                            handleNoteDisplay();*/
+                            handleHelpDisplay();
                             break;
                         }
                     case "__cancel":
                         {
-                            ModEntry._Monitor.Log("calcel!!!", LogLevel.Info);
                             exitMenu();
                             break;
                         }
                 }
+            }, false, false);
+        }
+
+        public static void handleHelpDisplay()
+        {
+            if(Api != null && isAppRunning.Value)
+            {
+                MobilePhoneRender.protrait.Clear();
+                MobilePhoneRender.landscape.Clear();
+                MobilePhoneRender.setBG("question");
+                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.help"), 30, 60, 250, 120, Game1.dialogueFont));
+                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
+                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 35, 255, 210, 60, null, true));
+                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 35, 306, 210, 60, null, true));
+                MobilePhoneRender.protrait.Add(new RenderPack(Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel"), 35, 363, 210, 60, null, true));
+                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.help"), 55, 35, 150, 190, Game1.dialogueFont));
+                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 230, 50, 210, 60, null, true));
+                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 230, 101, 210, 60, null, true));
+                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 230, 152, 210, 60, null, true));
+                MobilePhoneRender.landscape.Add(new RenderPack(Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel"), 230, 203, 210, 60, null, true));
+            }
+
+            List<KeyValuePair<string, string>> responses = new()
+            {
+                new KeyValuePair<string, string>("local", ModEntry._Helper.Translation.Get("local")),
+                new KeyValuePair<string, string>("global", ModEntry._Helper.Translation.Get("global")),
+                new KeyValuePair<string, string>("qi", ModEntry._Helper.Translation.Get("qi")),
+                new KeyValuePair<string, string>("__cancel", Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel"))
+            };
+            Game1.currentLocation.ShowPagedResponses(ModEntry._Helper.Translation.Get("app.help"), responses, delegate (string callId)
+            {
+                if(callId == "__cancel")
+                {
+                    exitMenu();
+                    return;
+                }
+
+                Game1.multipleDialogues(
+                    ModEntry._Helper.Translation.Get(
+                        callId + "_help", new { percent = (ModEntry.getPriceModifier() - 1).ToString("P1") }
+                    ).ToString().Split('$')
+                );
+
+                Game1.delayedActions.Add(
+                    new DelayedAction(20, () => { 
+                        GUI.needToCheckDialogueBox.Value = true;
+                        GUI.returnToHelpPage.Value = true;
+                    })
+                );
+
+                handleNoteDisplay();
             }, false, false);
         }
 

@@ -22,7 +22,7 @@ namespace JojaExpress
         public static PerScreen<bool> showAnimation = new(), droped = new();
         public static PerScreen<Vector2> target = new(), current = new();
         public static PerScreen<GameLocation> targetLocation = new();
-        public static PerScreen<bool> needToCheckDialogueBox = new();
+        public static PerScreen<bool> needToCheckDialogueBox = new(), returnToHelpPage = new();
 
         public static void openMenu(string shopId, Func<ISalable, Farmer, int, bool> onPurchase, Func<ISalable, string> getPostFix)
         {
@@ -119,8 +119,10 @@ namespace JojaExpress
             }
             if (PlayerInteractionHandler.Api != null && e.OldMenu is DialogueBox && PlayerInteractionHandler.Api.GetRunningApp() == "Joja Express" && needToCheckDialogueBox.Value)
             {
-                PlayerInteractionHandler.exitMenu();
+                if (returnToHelpPage.Value) PlayerInteractionHandler.handleHelpDisplay();
+                else PlayerInteractionHandler.exitMenu();
                 needToCheckDialogueBox.Value = false;
+                returnToHelpPage.Value = false;
             }
         }
 
