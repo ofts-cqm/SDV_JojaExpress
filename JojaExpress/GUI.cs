@@ -24,14 +24,14 @@ namespace JojaExpress
         public static PerScreen<GameLocation> targetLocation = new();
         public static PerScreen<bool> needToCheckDialogueBox = new(), returnToHelpPage = new();
 
-        public static void openMenu(string shopId, Func<ISalable, Farmer, int, bool> onPurchase, Func<ISalable, string> getPostFix)
+        public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Func<ISalable, string> getPostFix)
         {
             if (!DataLoader.Shops(Game1.content).TryGetValue(shopId, out var value)) return;
 
             ShopOwnerData[] source = ShopBuilder.GetCurrentOwners(value).ToArray();
             ShopOwnerData? ownerData = source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone) ?? source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone);
 
-            JojaShopMenu menu = new(shopId, value, ownerData, onPurchase, getPostFix);
+            JojaShopMenu menu = new(shopId, value, ownerData, knownPurchased, getPostFix);
             menu.searchBox.Selected = false;
             Game1.activeClickableMenu = menu;
         }

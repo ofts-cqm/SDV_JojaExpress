@@ -102,13 +102,13 @@ namespace JojaExpress
                 {
                     case "local":
                         {
-                            GUI.openMenu("ofts.JojaExp.jojaLocal", sentPurchasedItem, GUI.getPostFixForLocalItem);
                             ModEntry.localReceived = new();
+                            GUI.openMenu("ofts.JojaExp.jojaLocal", ModEntry.localReceived, GUI.getPostFixForLocalItem);
                             break;
                         }
                     case "global":
                         {
-                            GUI.openMenu("ofts.JojaExp.jojaGlobal", mailPurchasedItem, GUI.getPostFixForItem);
+                            GUI.openMenu("ofts.JojaExp.jojaGlobal", ModEntry.tobeReceived.Last(), GUI.getPostFixForItem);
                             break;
                         }
                     case "qi":
