@@ -297,7 +297,7 @@ namespace JojaExpress
                     List<QuantityModifier>? modifiers = shop.Value.PriceModifiers;
                     foreach (ShopItemData item in shop.Value.Items)
                     {
-                        if (item.ItemId == null || !ItemRegistry.IsQualifiedItemId(item.ItemId)) continue;
+                        if (item.ItemId == null || !ItemRegistry.IsQualifiedItemId(item.ItemId) || item.TradeItemId != null) continue;
                         if (ids.Contains(item.ItemId)) continue;
                         if (!item.IgnoreShopPriceModifiers && modifiers != null && modifiers.Count != 0)
                         {

@@ -1,10 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.ItemTypeDefinitions;
+using StardewValley.Logging;
 using StardewValley.Menus;
+using StardewValley.Triggers;
+using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace JojaExpress
 {
@@ -72,10 +78,6 @@ namespace JojaExpress
                 Game1.playSound(closeSound);
                 exitThisMenu();
             }
-            if (Game1.activeClickableMenu == null)
-            {
-                return;
-            }
 
             _ = inventory.snapToClickableComponent(x, y);
             if (downArrow.containsPoint(x, y) && currentItemIndex < Math.Max(0, forSale.Count - 4))
@@ -104,6 +106,21 @@ namespace JojaExpress
                 if (tabButtons[i].containsPoint(x, y))
                 {
                     switchTab(i);
+                }
+            }
+
+            for(int i = 0; i < 4; i++)
+            {
+                int index = currentItemIndex + i;
+                if (pricePlus[i].containsPoint(x, y) && purchased.Count > index && forSale.Contains(purchased[index].Key)) 
+                {
+                    purchase(purchased[index].Key, true, index);
+                    return;
+                }
+                if (priceMin[i].containsPoint(x, y) && purchased.Count > index)
+                {
+                    purchase(purchased[index].Key, false, index);
+                    return;
                 }
             }
         }
@@ -214,6 +231,123 @@ namespace JojaExpress
                     return;
                 }
             }
+        }
+
+        public void purchase(ISalable item, bool purchase, int index)
+        {
+            int val = getPurchaseAmount(item);
+            if (!purchase) val = -val;
+
+            if (val != 0)
+            {
+                if (__purchase(item, val))
+                    //itemPriceAndStock.Remove(item);
+                    forSale.Remove(item);
+                if (itemPriceAndStock[item].Stock != 0 && !forSale.Contains(item))
+                    forSale.Add(item);
+                if (purchased[index].Value == 0)
+                {
+                    purchased.RemoveAt(index);
+                }
+            }
+            else
+            {
+                if (itemPriceAndStock[item].Price > 0) Game1.dayTimeMoneyBox.moneyShakeTimer = 1000;
+                Game1.playSound("cancel");
+            }
+                
+            currentItemIndex = Math.Max(0, Math.Min(forSale.Count - 4, currentItemIndex));
+            updateSaleButtonNeighbors();
+            setScrollBarToCurrentIndex();
+        }
+
+        public int getPurchaseAmount(ISalable item)
+        {
+            if (!Game1.oldKBState.IsKeyDown(Keys.LeftShift)) return 1;
+            int currentVal, price = Math.Max(1, itemPriceAndStock[item].Price);
+
+            if (Game1.oldKBState.IsKeyDown(Keys.LeftControl)) 
+                currentVal = Game1.oldKBState.IsKeyDown(Keys.D1) ? 999 : 25;
+            else currentVal = 5;
+
+            int maxAmount = getPlayerCurrencyAmount(Game1.player, currency) / price;
+            if (currentVal > maxAmount)
+                currentVal = maxAmount;
+
+            currentVal = Math.Min(currentVal, Math.Max(1, itemPriceAndStock[item].Stock));
+            currentVal = Math.Min(currentVal, item.maximumStackSize());
+            if (currentVal == -1) currentVal = 1;
+
+            return currentVal;
+        }
+
+        public bool __purchase(ISalable item, int stockToBuy)
+        {
+            chargePlayer(Game1.player, currency, itemPriceAndStock[item].Price * stockToBuy);
+            if (!_isStorageShop && item.actionWhenPurchased(ShopId))
+            {
+                if (item.IsRecipe)
+                {
+                    string key = heldItem.Name.Substring(0, heldItem.Name.IndexOf("Recipe") - 1);
+                    if (item is Item obj && obj.Category == -7) Game1.player.cookingRecipes.Add(key, 0);
+                    else Game1.player.craftingRecipes.Add(key, 0);
+                    Game1.playSound("newRecipe");
+                }
+                heldItem = null;
+            }
+            else
+            {
+                if ((heldItem as Item)?.QualifiedItemId == "(O)858")
+                {
+                    Game1.player.team.addQiGemsToTeam.Fire(heldItem.Stack);
+                    heldItem = null;
+                }
+
+                if (Game1.mouseClickPolling > 300)
+                    if (purchaseRepeatSound != null) Game1.playSound(purchaseRepeatSound);
+                else if (purchaseSound != null) Game1.playSound(purchaseSound);
+            }
+
+            if (itemPriceAndStock[item].Stock != int.MaxValue && !item.IsInfiniteStock())
+            {
+                HandleSynchedItemPurchase(item, Game1.player, stockToBuy);
+                ItemStockInformation itemStockInformation = itemPriceAndStock[item];
+                item.Stack = Math.Min(item.Stack, itemStockInformation.Stock);
+                if (itemStockInformation.ItemToSyncStack != null)
+                {
+                    itemStockInformation.ItemToSyncStack.Stack = itemStockInformation.Stock;
+                }
+            }
+
+            List<string> actionsOnPurchase = itemPriceAndStock[item].ActionsOnPurchase;
+            if (actionsOnPurchase != null && actionsOnPurchase.Count > 0)
+            {
+                foreach (string item2 in itemPriceAndStock[item].ActionsOnPurchase)
+                {
+                    if (!TriggerActionManager.TryRunAction(item2, out var error, out var exception))
+                    {
+                        DefaultInterpolatedStringHandler defaultInterpolatedStringHandler = new DefaultInterpolatedStringHandler(56, 4);
+                        defaultInterpolatedStringHandler.AppendLiteral("Shop ");
+                        defaultInterpolatedStringHandler.AppendFormatted(ShopId);
+                        defaultInterpolatedStringHandler.AppendLiteral(" ignored invalid action '");
+                        defaultInterpolatedStringHandler.AppendFormatted(item2);
+                        defaultInterpolatedStringHandler.AppendLiteral("' on purchase of item '");
+                        defaultInterpolatedStringHandler.AppendFormatted(item.QualifiedItemId);
+                        defaultInterpolatedStringHandler.AppendLiteral("': ");
+                        defaultInterpolatedStringHandler.AppendFormatted(error);
+                        ModEntry._Monitor.Log(defaultInterpolatedStringHandler.ToStringAndClear(), LogLevel.Error);
+                    }
+                }
+            }
+
+            onPurchase(item, Game1.player, stockToBuy);
+
+            if (itemPriceAndStock[item].Stock <= 0)
+            {
+                hoveredItem = null;
+                return true;
+            }
+            return false;
         }
 
         public void previousMatch()

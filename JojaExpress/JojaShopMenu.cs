@@ -93,8 +93,8 @@ namespace JojaExpress
             for(int i = 0; i < 4; i++)
             {
                 priceBG[i] = new ClickableTextureComponent(new Rectangle(forSaleButtons[i].bounds.X + 800, forSaleButtons[i].bounds.Y + 24, 96 * 2, 32 * 2), price, new Rectangle(0, 0, 96, 32), 2f);
-                pricePlus[i] = new ClickableTextureComponent(new Rectangle(forSaleButtons[i].bounds.X + 800 + 12, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40), price, new Rectangle(6, 6, 16, 16), 2f);
-                priceMin[i] = new ClickableTextureComponent(new Rectangle(forSaleButtons[i].bounds.X + 800 + 140, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40), price, new Rectangle(70, 6, 16, 16), 2f);
+                priceMin[i] = new ClickableTextureComponent(new Rectangle(forSaleButtons[i].bounds.X + 800 + 12, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40), price, new Rectangle(6, 6, 20, 20), 2f);
+                pricePlus[i] = new ClickableTextureComponent(new Rectangle(forSaleButtons[i].bounds.X + 800 + 140, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40), price, new Rectangle(70, 6, 20, 20), 2f);
             }
         }
 
@@ -258,8 +258,8 @@ namespace JojaExpress
             for (int i = 0; i < 4; i++)
             {
                 priceBG[i].bounds = new Rectangle(forSaleButtons[i].bounds.X + 800, forSaleButtons[i].bounds.Y + 24, 96 * 2, 32 * 2);
-                pricePlus[i].bounds = new Rectangle(forSaleButtons[i].bounds.X + 800 + 12, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
-                priceMin[i].bounds = new Rectangle(forSaleButtons[i].bounds.X + 800 + 140, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
+                priceMin[i].bounds = new Rectangle(forSaleButtons[i].bounds.X + 800 + 12, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
+                pricePlus[i].bounds = new Rectangle(forSaleButtons[i].bounds.X + 800 + 140, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
             }
         }
 
@@ -289,8 +289,17 @@ namespace JojaExpress
                         //hoverPrice = ((itemPriceAndStock != null && itemPriceAndStock.TryGetValue(salable, out var value)) ? value.Price : salable.salePrice());
                         hoveredItem = salable;
                         forSaleButtons[i].scale = Math.Min(forSaleButtons[i].scale + 0.03f, 1.1f);
+                        if (pricePlus[i].containsPoint(x, y)) pricePlus[i].scale = Math.Min(pricePlus[i].scale + 0.06f, 2.2f);
+                        else pricePlus[i].scale = Math.Max(2f, pricePlus[i].scale - 0.06f);
+                        if (priceMin[i].containsPoint(x, y)) priceMin[i].scale = Math.Min(priceMin[i].scale + 0.06f, 2.2f);
+                        else priceMin[i].scale = Math.Max(2f, pricePlus[i].scale - 0.06f);
                     }
-                    else forSaleButtons[i].scale = Math.Max(1f, forSaleButtons[i].scale - 0.03f);
+                    else 
+                    {
+                        forSaleButtons[i].scale = Math.Max(1f, forSaleButtons[i].scale - 0.03f);
+                        pricePlus[i].scale = Math.Max(2f, pricePlus[i].scale - 0.06f);
+                        priceMin[i].scale = Math.Max(2f, pricePlus[i].scale - 0.06f);
+                    }
                 }
                 return;
             }
