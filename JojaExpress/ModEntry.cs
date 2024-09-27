@@ -136,6 +136,7 @@ namespace JojaExpress
         public void load(object? sender,EventArgs e)
         {
             checkFeeState();
+            PlayerInteractionHandler.localArrived.Value = true;
 
             if(!Context.IsMainPlayer)
             {

@@ -77,6 +77,7 @@ namespace JojaExpress
                     obj.modData.Add(p.Key, p.Value.ToString());
                 }
                 targetLocation.Value.debris.Add(Game1.createItemDebris(obj, target.Value, 0));
+                PlayerInteractionHandler.localArrived.Value = true;
             }
             if (tick == 120) droped.Value = true;
 

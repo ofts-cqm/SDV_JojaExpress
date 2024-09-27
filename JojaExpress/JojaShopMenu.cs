@@ -2,21 +2,19 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.GameData.Shops;
-using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
-using System.Reflection;
 
 namespace JojaExpress
 {
-    public class JojaShopMenu : ShopMenu
+    public partial class JojaShopMenu : ShopMenu
     {
         Func<ISalable, string> getPostfix;
         ClickableTextureComponent searchTexture, previousButton, nextButton, cartButton;
-        Texture2D tmp;
+        ClickableTextureComponent[] priceBG, pricePlus, priceMin;
+        Texture2D tmp, price;
         public TextBox searchBox;
         public bool viewingCart = false;
         public string currentOption = "";
@@ -31,6 +29,7 @@ namespace JojaExpress
             this.getPostfix = getPostfix;
             this.knownPurchased = knownPurchased;
             tmp = ModEntry._Helper.ModContent.Load<Texture2D>("assets/Search");
+            price = ModEntry._Helper.ModContent.Load<Texture2D>("assets/price");
             cartButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen, yPositionOnScreen - 64, width, 64), 
                 ModEntry._Helper.ModContent.Load<Texture2D>("assets/cart_button"), 
@@ -86,6 +85,17 @@ namespace JojaExpress
             {
                 purchased.Add(new KeyValuePair<ISalable, int>(ItemRegistry.Create(p.Key), p.Value));
             }
+
+            priceBG = new ClickableTextureComponent[4];
+            pricePlus = new ClickableTextureComponent[4];
+            priceMin = new ClickableTextureComponent[4];
+
+            for(int i = 0; i < 4; i++)
+            {
+                priceBG[i] = new ClickableTextureComponent(new Rectangle(forSaleButtons[i].bounds.X + 800, forSaleButtons[i].bounds.Y + 24, 96 * 2, 32 * 2), price, new Rectangle(0, 0, 96, 32), 2f);
+                pricePlus[i] = new ClickableTextureComponent(new Rectangle(forSaleButtons[i].bounds.X + 800 + 12, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40), price, new Rectangle(6, 6, 16, 16), 2f);
+                priceMin[i] = new ClickableTextureComponent(new Rectangle(forSaleButtons[i].bounds.X + 800 + 140, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40), price, new Rectangle(70, 6, 16, 16), 2f);
+            }
         }
 
         public void customExit()
@@ -121,44 +131,6 @@ namespace JojaExpress
             return false;
         }
 
-        public void nextMatch(TextBox sender)
-        {
-            int i = currentItemIndex;
-            while (true)
-            {
-                i++;
-                i %= forSale.Count;
-                if (i == currentItemIndex) return;
-
-                if(forSale[i].DisplayName.Contains(searchBox.Text, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    currentItemIndex = i;
-                    ModEntry._Helper.Reflection.GetMethod(this, "setScrollBarToCurrentIndex").Invoke();
-                    updateSaleButtonNeighbors();
-                    return;
-                }
-            }
-        }
-
-        public void previousMatch()
-        {
-            int i = currentItemIndex;
-            while (true)
-            {
-                i--;
-                if (i < 0) i = forSale.Count - 1;
-                if (i == currentItemIndex) return;
-
-                if (forSale[i].DisplayName.Contains(searchBox.Text, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    currentItemIndex = i;
-                    ModEntry._Helper.Reflection.GetMethod(this, "setScrollBarToCurrentIndex").Invoke();
-                    updateSaleButtonNeighbors();
-                    return;
-                }
-            }
-        }
-
         public override void receiveKeyPress(Keys key)
         {
             if (!searchBox.Selected && !Game1.options.doesInputListContain(Game1.options.menuButton, key))
@@ -169,6 +141,18 @@ namespace JojaExpress
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
+            if (viewingCart)
+            {
+                if (cartButton.containsPoint(x, y))
+                {
+                    viewingCart = false;
+                    currentItemIndex = 0;
+                    currentOption = ModEntry._Helper.Translation.Get("view_cart");
+                    return;
+                }
+                alternateLeftClick(x, y);
+                return;
+            }
             base.receiveLeftClick(x, y, playSound);
             searchBox.Update();
             if(previousButton.containsPoint(x, y))
@@ -179,23 +163,17 @@ namespace JojaExpress
             {
                 nextMatch(null);
             }
-            else if(cartButton.containsPoint(x, y))
+            else if (cartButton.containsPoint(x, y))
             {
-                viewingCart = !viewingCart;
+                viewingCart = true;
                 currentItemIndex = 0;
-                if (viewingCart) currentOption = ModEntry._Helper.Translation.Get("view_shop");
-                else currentOption = ModEntry._Helper.Translation.Get("view_cart");
+                currentOption = ModEntry._Helper.Translation.Get("view_shop");
             }
         }
 
-        public T getValue<T>(string name)
+        public override void receiveRightClick(int x, int y, bool playSound = true)
         {
-            return (T)typeof(ShopMenu).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(this);
-        }
-
-        public T involkeMethod<T>(string name)
-        {
-            return (T)typeof(ShopMenu).GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(this, null);
+            if (!viewingCart) base.receiveRightClick(x, y, playSound);
         }
 
         public void drawSearchBox(SpriteBatch b)
@@ -223,80 +201,6 @@ namespace JojaExpress
             nextButton.draw(b);
         }
 
-        public void drawItemBox(SpriteBatch b, int i, ShopCachedTheme visualTheme, bool scrolling)
-        {
-            bool flag = canPurchaseCheck != null && !canPurchaseCheck(currentItemIndex + i);
-            drawTextureBox(b, visualTheme.ItemRowBackgroundTexture, visualTheme.ItemRowBackgroundSourceRect, forSaleButtons[i].bounds.X, forSaleButtons[i].bounds.Y, forSaleButtons[i].bounds.Width, forSaleButtons[i].bounds.Height, (forSaleButtons[i].containsPoint(Game1.getOldMouseX(), Game1.getOldMouseY()) && !scrolling) ? visualTheme.ItemRowBackgroundHoverColor : Color.White, 4f, drawShadow: false);
-            ISalable salable = forSale[currentItemIndex + i];
-            ItemStockInformation stockInfo = itemPriceAndStock[salable];
-            StackDrawType stackDrawType = GetStackDrawType(stockInfo, salable);
-            string text = salable.DisplayName;
-            if (salable.Stack > 1)
-            {
-                text = text + " x" + salable.Stack;
-            }
-            text += getPostfix.Invoke(salable);
-            b.Draw(visualTheme.ItemIconBackgroundTexture, new Vector2(forSaleButtons[i].bounds.X + 32 - 12, forSaleButtons[i].bounds.Y + 24 - 4), visualTheme.ItemIconBackgroundSourceRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
-            Vector2 vector = new Vector2(forSaleButtons[i].bounds.X + 32 - 8, forSaleButtons[i].bounds.Y + 24);
-            Color color = Color.White * ((!flag) ? 1f : 0.25f);
-            int num = 1;
-            if (itemPriceAndStock.TryGetValue(salable, out var value))
-            {
-                num = value.Stock;
-            }
-
-            salable.drawInMenu(b, vector, 1f, 1f, 0.9f, StackDrawType.HideButShowQuality, color, drawShadow: true);
-            if (num != int.MaxValue && ShopId != "ClintUpgrade" && ((stackDrawType == StackDrawType.Draw && num > 1) || stackDrawType == StackDrawType.Draw_OneInclusive))
-            {
-                Utility.drawTinyDigits(num, b, vector + new Vector2(64 - Utility.getWidthOfTinyDigitString(num, 3f) + 3, 47f), 3f, 1f, color);
-            }
-
-            string text2 = text;
-            bool flag2 = itemPriceAndStock[forSale[currentItemIndex + i]].Price > 0;
-            if (SpriteText.getWidthOfString(text2) > width - (flag2 ? (150 + SpriteText.getWidthOfString(itemPriceAndStock[forSale[currentItemIndex + i]].Price + " ")) : 100) && text2.Length > (flag2 ? 27 : 37))
-            {
-                text2 = text2.Substring(0, flag2 ? 27 : 37);
-                text2 += "...";
-            }
-
-            SpriteText.drawString(b, text2, forSaleButtons[i].bounds.X + 96 + 8, forSaleButtons[i].bounds.Y + 28, 999999, -1, 999999, flag ? 0.5f : 1f, 0.88f, junimoText: false, -1, "", visualTheme.ItemRowTextColor);
-
-            int num2 = forSaleButtons[i].bounds.Right;
-            int num3 = forSaleButtons[i].bounds.Y + 28 - 4;
-            int y = forSaleButtons[i].bounds.Y + 44;
-            if (itemPriceAndStock[forSale[currentItemIndex + i]].Price > 0)
-            {
-                SpriteText.drawString(b, itemPriceAndStock[forSale[currentItemIndex + i]].Price + " ", num2 - SpriteText.getWidthOfString(itemPriceAndStock[forSale[currentItemIndex + i]].Price + " ") - 60, forSaleButtons[i].bounds.Y + 28, 999999, -1, 999999, (getPlayerCurrencyAmount(Game1.player, currency) >= itemPriceAndStock[forSale[currentItemIndex + i]].Price && !flag) ? 1f : 0.5f, 0.88f, junimoText: false, -1, "", visualTheme.ItemRowTextColor);
-                Utility.drawWithShadow(b, Game1.mouseCursors, new Vector2(forSaleButtons[i].bounds.Right - 52, forSaleButtons[i].bounds.Y + 40 - 4), new Rectangle(193 + currency * 9, 373, 9, 10), Color.White * ((!flag) ? 1f : 0.25f), 0f, Vector2.Zero, 4f, flipped: false, 1f, -1, -1, (!flag) ? 0.35f : 0f);
-                num2 -= SpriteText.getWidthOfString(itemPriceAndStock[forSale[currentItemIndex + i]].Price + " ") + 96;
-                num3 = forSaleButtons[i].bounds.Y + 20;
-                y = forSaleButtons[i].bounds.Y + 28;
-            }
-
-            if (itemPriceAndStock[forSale[currentItemIndex + i]].TradeItem != null)
-            {
-                int count = 5;
-                string tradeItem = itemPriceAndStock[forSale[currentItemIndex + i]].TradeItem;
-                if (tradeItem != null && itemPriceAndStock[forSale[currentItemIndex + i]].TradeItemCount.HasValue)
-                {
-                    count = itemPriceAndStock[forSale[currentItemIndex + i]].TradeItemCount.Value;
-                }
-
-                bool flag3 = HasTradeItem(tradeItem, count);
-                if (canPurchaseCheck != null && !canPurchaseCheck(currentItemIndex + i))
-                {
-                    flag3 = false;
-                }
-
-                float num4 = SpriteText.getWidthOfString("x" + count);
-                ParsedItemData dataOrErrorItem = ItemRegistry.GetDataOrErrorItem(tradeItem);
-                Texture2D texture = dataOrErrorItem.GetTexture();
-                Rectangle sourceRect = dataOrErrorItem.GetSourceRect();
-                Utility.drawWithShadow(b, texture, new Vector2((float)(num2 - 88) - num4, num3), sourceRect, Color.White * (flag3 ? 1f : 0.25f), 0f, Vector2.Zero, -1f, flipped: false, -1f, -1, -1, flag3 ? 0.35f : 0f);
-                SpriteText.drawString(b, "x" + count, num2 - (int)num4 - 16, y, 999999, -1, 999999, flag3 ? 1f : 0.5f, 0.88f, junimoText: false, -1, "", visualTheme.ItemRowTextColor);
-            }
-        }
-
         public void drawCartBox(SpriteBatch b, int i, ShopCachedTheme visualTheme, bool scrolling)
         {
             if (currentItemIndex + i >= purchased.Count) return;
@@ -320,7 +224,17 @@ namespace JojaExpress
             ISalable salable = purchased[currentItemIndex + i].Key;
             int num = purchased[currentItemIndex + i].Value;
             salable.drawInMenu(b, vector, 1f, 1f, 0.9f, StackDrawType.HideButShowQuality, color, drawShadow: true);
-            SpriteText.drawString(b, salable.DisplayName, forSaleButtons[i].bounds.X + 96 + 8, forSaleButtons[i].bounds.Y + 28, 999999, -1, 999999, 1f, 0.88f, junimoText: false, -1, "", visualTheme.ItemRowTextColor);
+            SpriteText.drawString(
+                b, salable.DisplayName, forSaleButtons[i].bounds.X + 96 + 8, 
+                forSaleButtons[i].bounds.Y + 28, color: visualTheme.ItemRowTextColor
+            );
+            priceBG[i].draw(b);
+            pricePlus[i].draw(b);
+            priceMin[i].draw(b);
+            int numLength = SpriteText.getWidthOfString(num + "");
+            SpriteText.drawString(
+                b, num + "", forSaleButtons[i].bounds.X + 860 + (70 - numLength)/2, forSaleButtons[i].bounds.Y + 32, color: Color.Gray
+            );
         }
 
         public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
@@ -341,12 +255,50 @@ namespace JojaExpress
                 xPositionOnScreen + 4 + 132, yPositionOnScreen + height - inventory.height + 44 * 4,
                 nextButton.bounds.Width, nextButton.bounds.Height);
             cartButton.bounds = new Rectangle(xPositionOnScreen, yPositionOnScreen - 64, width, 64);
+            for (int i = 0; i < 4; i++)
+            {
+                priceBG[i].bounds = new Rectangle(forSaleButtons[i].bounds.X + 800, forSaleButtons[i].bounds.Y + 24, 96 * 2, 32 * 2);
+                pricePlus[i].bounds = new Rectangle(forSaleButtons[i].bounds.X + 800 + 12, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
+                priceMin[i].bounds = new Rectangle(forSaleButtons[i].bounds.X + 800 + 140, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
+            }
+        }
+
+        public override void performHoverAction(int x, int y)
+        {
+            if (viewingCart)
+            {
+                upperRightCloseButton?.tryHover(x, y, 0.5f);
+                hoverText = "";
+                hoveredItem = null;
+                hoverPrice = -1;
+                boldTitleText = "";
+                upArrow.tryHover(x, y);
+                downArrow.tryHover(x, y);
+                scrollBar.tryHover(x, y);
+                if (getValue<bool>("scrolling"))
+                {
+                    return;
+                }
+                for (int i = 0; i < forSaleButtons.Count; i++)
+                {
+                    if (currentItemIndex + i < purchased.Count && forSaleButtons[i].containsPoint(x, y))
+                    {
+                        ISalable salable = purchased[currentItemIndex + i].Key;
+                        hoverText = salable.getDescription();
+                        boldTitleText = salable.DisplayName;
+                        //hoverPrice = ((itemPriceAndStock != null && itemPriceAndStock.TryGetValue(salable, out var value)) ? value.Price : salable.salePrice());
+                        hoveredItem = salable;
+                        forSaleButtons[i].scale = Math.Min(forSaleButtons[i].scale + 0.03f, 1.1f);
+                    }
+                    else forSaleButtons[i].scale = Math.Max(1f, forSaleButtons[i].scale - 0.03f);
+                }
+                return;
+            }
+            base.performHoverAction(x, y);
         }
 
         public override void draw(SpriteBatch b)
         {
-            ShopMenu father = this as ShopMenu;
-            IReflectionHelper helper = ModEntry.Instance.Helper.Reflection;
             Rectangle scrollBarRunner = getValue<Rectangle>("scrollBarRunner");
             bool scrolling = getValue<bool>("scrolling");
             TemporaryAnimatedSpriteList animations = getValue<TemporaryAnimatedSpriteList>("animations");
@@ -407,30 +359,7 @@ namespace JojaExpress
                 scrollBar.draw(b);
             }
 
-            if (!hoverText.Equals(""))
-            {
-                if (hoveredItem?.IsRecipe ?? false)
-                {
-                    drawToolTip(
-                        b, " ", boldTitleText, hoveredItem as Item, heldItem != null, -1, currency,
-                        involkeMethod<string>("getHoveredItemExtraItemIndex"),
-                        involkeMethod<int>("getHoveredItemExtraItemAmount"),
-                        new CraftingRecipe(hoveredItem.Name.Replace(" Recipe", "")),
-                        (hoverPrice > 0) ? hoverPrice : (-1)
-                    );
-                }
-                else
-                {
-                    drawToolTip(
-                        b, hoverText, boldTitleText, hoveredItem as Item,
-                        heldItem != null, -1, currency,
-                        involkeMethod<string>("getHoveredItemExtraItemIndex"),
-                        involkeMethod<int>("getHoveredItemExtraItemAmount"),
-                        null, (hoverPrice > 0) ? hoverPrice : (-1)
-                     );
-                }
-            }
-
+            drawToolTip(b);
             upperRightCloseButton.draw(b);
             drawMouse(b);
         }

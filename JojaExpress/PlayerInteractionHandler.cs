@@ -10,7 +10,7 @@ namespace JojaExpress
     public class PlayerInteractionHandler
     {
         public static IMobilePhoneApi Api;
-        public static PerScreen<bool> isAppRunning = new(), isJPadRunning = new();
+        public static PerScreen<bool> isAppRunning = new(), isJPadRunning = new(), localArrived = new();
 
         public static void checkInv(object? sender, InventoryChangedEventArgs args)
         {
@@ -102,7 +102,17 @@ namespace JojaExpress
                 {
                     case "local":
                         {
+                            if (!localArrived.Value)
+                            {
+                                Game1.multipleDialogues(ModEntry._Helper.Translation.Get("wait").ToString().Split('$'));
+                                Game1.delayedActions.Add(
+                                    new DelayedAction(20, () => { GUI.needToCheckDialogueBox.Value = true; })
+                                    );
+                                handleNoteDisplay();
+                                break;
+                            }
                             ModEntry.localReceived = new();
+                            localArrived.Value = false;
                             GUI.openMenu("ofts.JojaExp.jojaLocal", ModEntry.localReceived, GUI.getPostFixForLocalItem);
                             break;
                         }
@@ -121,15 +131,6 @@ namespace JojaExpress
                         }
                     case "help":
                         {
-                            /*Game1.multipleDialogues(
-                                ModEntry._Helper.Translation.Get(
-                                    "info", new { percent = (ModEntry.getPriceModifier() - 1).ToString("P1") }
-                                ).ToString().Split('$')
-                            );
-                            Game1.delayedActions.Add(
-                                new DelayedAction(20, () => { GUI.needToCheckDialogueBox.Value = true; })
-                                );
-                            handleNoteDisplay();*/
                             handleHelpDisplay();
                             break;
                         }
