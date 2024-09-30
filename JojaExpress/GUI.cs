@@ -31,8 +31,9 @@ namespace JojaExpress
             ShopOwnerData[] source = ShopBuilder.GetCurrentOwners(value).ToArray();
             ShopOwnerData? ownerData = source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone) ?? source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone);
 
-            JojaShopMenu menu = new(shopId, value, ownerData, knownPurchased, getPostFix);
-            menu.searchBox.Selected = false;
+            CustomizedShop menu = new(shopId, value, knownPurchased, (a) => { });
+            //JojaShopMenu menu = new(shopId, value, ownerData, knownPurchased, getPostFix);
+            //menu.searchBox.Selected = false;
             Game1.activeClickableMenu = menu;
         }
 

@@ -259,6 +259,17 @@ namespace JojaExpress
                 {
                     try
                     {
+                        Item? sampleItem = ItemRegistry.Create(p.Key);
+                        bool discard = sampleItem.actionWhenPurchased($"ofts.JojaExp.joja{(Game1.player.ActiveObject.QualifiedItemId.EndsWith("local") ? "Local" : "Global")}");
+                        if (sampleItem is not null && sampleItem.isRecipe.Value || discard)
+                        {
+                            string key = sampleItem.Name.Substring(0, sampleItem.Name.IndexOf("Recipe") - 1);
+                            if (sampleItem is Item obj && obj.Category == -7) Game1.player.cookingRecipes.Add(key, 0);
+                            else Game1.player.craftingRecipes.Add(key, 0);
+                            Game1.playSound("newRecipe");
+                            continue;
+                        }
+
                         for (int cnt = int.Parse(p.Value.Value); cnt > 0; cnt -= 999)
                         {
                             Game1.currentLocation.debris.Add(Game1.createItemDebris(ItemRegistry.Create(p.Key, Math.Min(cnt, 999)), Game1.player.Position, 0));
