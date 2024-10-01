@@ -9,6 +9,7 @@ using StardewValley.Menus;
 
 namespace JojaExpress
 {
+    [Obsolete("Too shitty", false)]
     public partial class JojaShopMenu : ShopMenu
     {
         Func<ISalable, string> getPostfix;

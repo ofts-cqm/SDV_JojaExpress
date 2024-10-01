@@ -152,18 +152,18 @@ namespace JojaExpress
                 return;
             }
             viewingNotification = true;
-            // Todo
+            // Todo complete this fuck
         }
 
         public void _tryCheckOut()
         {
             viewingNotification = true;
-            // Todo
+            // Todo complete this fuck
         }
 
         public void drawNotification(SpriteBatch b)
         {
-            // Todo
+            // Todo complete this fuck
         }
 
         public void drawAnimation(SpriteBatch b)
