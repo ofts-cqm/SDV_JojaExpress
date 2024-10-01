@@ -115,7 +115,7 @@ namespace JojaExpress
 
         public static void checkUI(object? sender, MenuChangedEventArgs e)
         {
-            if (e.OldMenu is JojaShopMenu shop && shop.ShopId == "ofts.JojaExp.jojaLocal" && ModEntry.localReceived.Count > 0)
+            if (e.OldMenu is CustomizedShop shop && shop.shopId == "ofts.JojaExp.jojaLocal" && ModEntry.localReceived.Count > 0)
             {
                 sendPackage(Game1.player);
             }

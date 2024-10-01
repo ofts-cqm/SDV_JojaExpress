@@ -4,33 +4,40 @@ namespace JojaExpress
 {
     public class View
     {
-        private List<KeyValuePair<ISalable, ItemStockInformation>> list;
-        private List<int> indices;
-        public int Count => indices.Count;
+        private List<ISalable> list;
+        private Dictionary<ISalable, ItemStockInformation> originalDic;
+        public int Count => list.Count;
 
-        public View(List<KeyValuePair<ISalable, ItemStockInformation>> list)
+        public View(Dictionary<ISalable, ItemStockInformation> list)
         {
-            this.list = list;
-            indices = new List<int>(list.Count);
-            for(int i = 0; i < list.Count; i++)
+            this.list = list.Keys.ToList();
+            originalDic = list;
+        }
+
+        public void filter(string word)
+        {
+            list.Clear();
+            foreach (ISalable salable in originalDic.Keys)
             {
-                indices.Add(i);
+                if(salable.DisplayName.Contains(word)) list.Add(salable);
             }
         }
 
-        public KeyValuePair<ISalable, ItemStockInformation> this[int index]
+        public ISalable this[int index]
         {
-            get { return list[indices[index]]; }
-            set { list[indices[index]] = value; }
+            get { return list[index]; }
+            set { list[index] = value; }
         }
 
         public void RemoveAt(int index)
         {
-            list.RemoveAt(indices[index]);
-            for(int i = index; i < indices.Count; i++)
-            {
-                indices[i]--;
-            }
+            originalDic.Remove(list[index]);
+            list.RemoveAt(index);
+        }
+
+        public ItemStockInformation getValue(int index)
+        {
+            return originalDic[list[index]];
         }
     }
 }

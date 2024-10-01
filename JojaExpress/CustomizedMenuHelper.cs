@@ -50,9 +50,9 @@ namespace JojaExpress
             downArrow = new(Rectangle.Empty, MenuTexture, ScrollDownSourceRect, 4f);
             scrollBar = new(Rectangle.Empty, MenuTexture, ScrollBarFrontSourceRect, 4f);
 
-            cartButton = new(Rectangle.Empty, PriceTexture, new Rectangle(0, 0, 130, 25), 4f);
-            checkOutButton = new(Rectangle.Empty, PriceTexture, new Rectangle(130, 0, 65, 25), 4f);
-            backButton = new(Rectangle.Empty, PriceTexture, new Rectangle(195, 0, 65, 25), 4f);
+            cartButton = new(Rectangle.Empty, PriceTexture, new Rectangle(96, 0, 130, 25), 4f);
+            checkOutButton = new(Rectangle.Empty, PriceTexture, new Rectangle(291, 0, 65, 25), 4f);
+            backButton = new(Rectangle.Empty, PriceTexture, new Rectangle(226, 0, 65, 25), 4f);
             searchTab = new(Rectangle.Empty, "searchTab");
             moneyTab = new(Rectangle.Empty, "moneyTab");
             search = new(Rectangle.Empty, Game1.mouseCursors, SearchIconSourceRect, 4f);
@@ -74,11 +74,11 @@ namespace JojaExpress
             xPositionOnScreen = Game1.uiViewport.Width / 2 - 580 + borderWidth;
             yPositionOnScreen = Game1.uiViewport.Height / 2 - 350 + borderWidth;
 
-            upperRightCloseButton.bounds = new(xPositionOnScreen + width, yPositionOnScreen, 48, 48);
+            upperRightCloseButton.bounds = new(xPositionOnScreen + width - 4, yPositionOnScreen, 48, 48);
             upArrow.bounds = new(xPositionOnScreen + width, yPositionOnScreen + 60, 44, 48);
             downArrow.bounds = new(xPositionOnScreen + width, yPositionOnScreen + height - 64, 44, 48);
             scrollBar.bounds = new(upArrow.bounds.X + 12, upArrow.bounds.Y + upArrow.bounds.Height + 4, 24, 40);
-            scrollBarRunner = new(scrollBar.bounds.X, upArrow.bounds.Y + upArrow.bounds.Height + 4, scrollBar.bounds.Width, height - 104 - upArrow.bounds.Height - 28);
+            scrollBarRunner = new(scrollBar.bounds.X, upArrow.bounds.Y + upArrow.bounds.Height + 4, scrollBar.bounds.Width, height - 220);
 
             cartButton.bounds = new(xPositionOnScreen + 560, yPositionOnScreen + height - 100, 520, 100);
             checkOutButton.bounds = new(xPositionOnScreen + 820, yPositionOnScreen + height - 100, 260, 100);
@@ -91,9 +91,9 @@ namespace JojaExpress
             for (int i = 0; i < 4; i++)
             {
                 forSaleButtons[i].bounds = new(xPositionOnScreen + 16, yPositionOnScreen + 83 + i * ((height - 206) / 4), width - 32, (height - 206) / 4 + 4);
-                priceBG[i].bounds = new(forSaleButtons[i].bounds.X + 900, forSaleButtons[i].bounds.Y + 24, 96 * 2, 32 * 2);
-                priceMin[i].bounds = new(forSaleButtons[i].bounds.X + 912, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
-                pricePlus[i].bounds = new(forSaleButtons[i].bounds.X + 1040, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
+                priceBG[i].bounds = new(forSaleButtons[i].bounds.X + 830, forSaleButtons[i].bounds.Y + 24, 96 * 2, 32 * 2);
+                priceMin[i].bounds = new(forSaleButtons[i].bounds.X + 842, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
+                pricePlus[i].bounds = new(forSaleButtons[i].bounds.X + 970, forSaleButtons[i].bounds.Y + 24 + 12, 40, 40);
             }
         }
 
@@ -105,8 +105,8 @@ namespace JojaExpress
                 currentVal = Game1.oldKBState.IsKeyDown(Keys.D1) ? 999 : 25;
             else currentVal = 5;
 
-            currentVal = Math.Min(currentVal, Math.Max(1, currentList[itemIndex].Value.Stock));
-            currentVal = Math.Min(currentVal, currentList[itemIndex].Key.maximumStackSize());
+            currentVal = Math.Min(currentVal, Math.Max(1, forSale[currentList[itemIndex]].Stock));
+            currentVal = Math.Min(currentVal, currentList[itemIndex].maximumStackSize());
             if (currentVal == -1) currentVal = 1;
 
             return currentVal;
@@ -114,10 +114,15 @@ namespace JojaExpress
 
         public void _setScrollBarToCurrentIndex()
         {
-
-            float num = scrollBarRunner.Height / (float)Math.Max(1, currentList.Count - 4 + 1);
-            scrollBar.bounds.Y = (int)(num * currentItemIndex + upArrow.bounds.Bottom + 4f);
-            if (currentItemIndex == currentList.Count - 4) scrollBar.bounds.Y = downArrow.bounds.Y - scrollBar.bounds.Height - 4;
+            if (currentList.Count > 0)
+            {
+                float num = scrollBarRunner.Height / (float)Math.Max(1, currentList.Count - 4 + 1);
+                scrollBar.bounds.Y = (int)(num * currentItemIndex + upArrow.bounds.Bottom + 4);
+                if (currentItemIndex == currentList.Count - 4)
+                {
+                    scrollBar.bounds.Y = downArrow.bounds.Y - scrollBar.bounds.Height - 4;
+                }
+            }
         }
 
         public void _downArrowPressed()
@@ -135,6 +140,31 @@ namespace JojaExpress
         }
 
         public override bool readyToClose() => animations.Count == 0;
+
+        public void _tryCloseMenu()
+        {
+            if (!viewingCart)
+            {
+                viewingCart = true;
+                currentItemIndex = 0;
+                currentList = new View(purchased);
+                searchString = "";
+                return;
+            }
+            viewingNotification = true;
+            // Todo
+        }
+
+        public void _tryCheckOut()
+        {
+            viewingNotification = true;
+            // Todo
+        }
+
+        public void drawNotification(SpriteBatch b)
+        {
+            // Todo
+        }
 
         public void drawAnimation(SpriteBatch b)
         {
@@ -196,7 +226,7 @@ namespace JojaExpress
             int num = stockInfo.Stock;
             int numLength = SpriteText.getWidthOfString(num + "");
             SpriteText.drawString(
-                b, num + "", forSaleButtons[i].bounds.X + 960 + (70 - numLength) / 2, forSaleButtons[i].bounds.Y + 32, color: Color.Gray
+                b, num + "", forSaleButtons[i].bounds.X + 890 + (70 - numLength) / 2, forSaleButtons[i].bounds.Y + 32, color: Color.Gray
             );
         }
 
@@ -210,8 +240,8 @@ namespace JojaExpress
                 forSaleButtons[i].bounds.Width, forSaleButtons[i].bounds.Height,
                 (forSaleButtons[i].containsPoint(Game1.getOldMouseX(), Game1.getOldMouseY()) && !scrolling) ?
                 Color.Wheat : Color.White, 4f, drawShadow: false);
-            ISalable salable = currentList[currentItemIndex + i].Key;
-            ItemStockInformation stockInfo = currentList[currentItemIndex + i].Value;
+            ISalable salable = currentList[currentItemIndex + i];
+            ItemStockInformation stockInfo = currentList.getValue(currentItemIndex + i);
 
             if (salable.ShouldDrawIcon()) drawSalableIcon(i, b, salable, stockInfo);
             drawSalableName(i, b, salable, stockInfo);
