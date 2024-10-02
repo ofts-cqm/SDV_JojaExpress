@@ -28,7 +28,7 @@ namespace JojaExpress
                 ItemStockInformation stockInfo = item.Value;
                 if (item.Key.IsRecipe)
                 {
-                    if (Game1.player.knowsRecipe(item.Key.Name)) return;
+                    if (Game1.player.knowsRecipe(item.Key.Name)) continue;
                     item.Key.Stack = 1;
                 }
                 if (stockInfo.Stock != 0) forSale.Add(item.Key, item.Value);
@@ -184,7 +184,6 @@ namespace JojaExpress
         {
             if (Game1.player.Money >= totalMoney)
             {
-                Game1.player.Money -= totalMoney;
                 checkout_exit();
                 return;
             }

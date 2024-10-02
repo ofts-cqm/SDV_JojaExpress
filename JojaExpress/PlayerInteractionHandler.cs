@@ -89,7 +89,7 @@ namespace JojaExpress
             {
                 Game1.multipleDialogues(ModEntry._Helper.Translation.Get("sorry").ToString().Split('$'));
                 Game1.delayedActions.Add(
-                    new DelayedAction(20, () => { GUI.needToCheckDialogueBox.Value = true; })
+                    new DelayedAction(50, () => { GUI.needToCheckDialogueBox.Value = true; })
                     );
                 handleNoteDisplay();
                 return;
@@ -173,6 +173,8 @@ namespace JojaExpress
             {
                 if(callId == "__cancel")
                 {
+                    GUI.needToCheckDialogueBox.Value = false;
+                    GUI.returnToHelpPage.Value = false;
                     exitMenu();
                     return;
                 }
@@ -184,7 +186,7 @@ namespace JojaExpress
                 );
 
                 Game1.delayedActions.Add(
-                    new DelayedAction(20, () => { 
+                    new DelayedAction(50, () => { 
                         GUI.needToCheckDialogueBox.Value = true;
                         GUI.returnToHelpPage.Value = true;
                     })
@@ -259,11 +261,15 @@ namespace JojaExpress
                 {
                     try
                     {
-                        Item? sampleItem = ItemRegistry.Create(p.Key);
-                        bool discard = sampleItem.actionWhenPurchased($"ofts.JojaExp.joja{(Game1.player.ActiveObject.QualifiedItemId.EndsWith("local") ? "Local" : "Global")}");
-                        if (sampleItem is not null && sampleItem.isRecipe.Value || discard)
+                        bool isRecipe = p.Key.StartsWith("rcp");
+                        string id = p.Key;
+                        if (isRecipe) id = p.Key.Substring(3);
+                        Item? sampleItem = ItemRegistry.Create(id);
+                        string shopId = $"ofts.JojaExp.joja{(Game1.player.ActiveObject.QualifiedItemId.EndsWith("local") ? "Local" : "Global")}";
+                        bool discard = sampleItem.actionWhenPurchased(shopId);
+                        if (sampleItem is not null && (isRecipe || discard))
                         {
-                            string key = sampleItem.Name.Substring(0, sampleItem.Name.IndexOf("Recipe") - 1);
+                            string key = sampleItem.Name;
                             if (sampleItem is Item obj && obj.Category == -7) Game1.player.cookingRecipes.Add(key, 0);
                             else Game1.player.craftingRecipes.Add(key, 0);
                             Game1.playSound("newRecipe");

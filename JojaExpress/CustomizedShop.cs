@@ -72,7 +72,7 @@ namespace JojaExpress
             searchEmptyStr = trans.Get("emptySearch");
 
             totalMoneyDial.currentValue = 0;
-            exitFunction = PlayerInteractionHandler.exitMenu;
+            exitFunction = () => { PlayerInteractionHandler.exitMenu(); PlayerInteractionHandler.localArrived.Value = true; };
         }
 
         public void updateSearchBox()
@@ -88,11 +88,12 @@ namespace JojaExpress
             Game1.player.Money -= totalMoney;
             foreach (var p in purchased)
             {
-                if (knownPurchased.ContainsKey(p.Key.QualifiedItemId))
+                string id = p.Key.IsRecipe ? "rcp" + p.Key.QualifiedItemId : p.Key.QualifiedItemId;
+                if (knownPurchased.ContainsKey(id))
                 {
-                    knownPurchased[p.Key.QualifiedItemId] = p.Value.Stock;
+                    knownPurchased[id] = p.Value.Stock;
                 }
-                else knownPurchased.Add(p.Key.QualifiedItemId, p.Value.Stock);
+                else knownPurchased.Add(id, p.Value.Stock);
                 Game1.player.team.synchronizedShopStock.OnItemPurchased(shopId, p.Key, forSale, p.Value.Stock);
             }
             actionOnClosed.Invoke(purchased.ToList());

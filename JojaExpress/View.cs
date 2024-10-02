@@ -11,7 +11,7 @@ namespace JojaExpress
         public View(Dictionary<ISalable, ItemStockInformation> list)
         {
             originalDic = list;
-            this.list = list.Keys.ToList().Where((salable) => originalDic[salable].Stock > 0).ToList();
+            this.list = list.Keys.ToList().Where((salable) => { return originalDic[salable].Stock > 0; }).ToList();
         }
 
         public void filter(string word)
