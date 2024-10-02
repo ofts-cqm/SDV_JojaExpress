@@ -121,14 +121,14 @@ namespace JojaExpress
             //{
             //    sendPackage(Game1.player);
             //}
-            if (PlayerInteractionHandler.Api != null && e.OldMenu is DialogueBox && PlayerInteractionHandler.Api.GetRunningApp() == "Joja Express" && needToCheckDialogueBox.Value)
+            /*if (PlayerInteractionHandler.Api != null && e.OldMenu is DialogueBox && PlayerInteractionHandler.Api.GetRunningApp() == "Joja Express" && needToCheckDialogueBox.Value)
             {
                 if (returnToHelpPage.Value) PlayerInteractionHandler.handleHelpDisplay();
                 else PlayerInteractionHandler.exitMenu();
                 needToCheckDialogueBox.Value = false;
                 returnToHelpPage.Value = false;
             }
-            else if (PlayerInteractionHandler.isJPadRunning.Value && needToCheckDialogueBox.Value)
+            else*/ if (needToCheckDialogueBox.Value)
             {
                 if (returnToHelpPage.Value) PlayerInteractionHandler.handleHelpDisplay();
                 else PlayerInteractionHandler.exitMenu();

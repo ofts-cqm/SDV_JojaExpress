@@ -17,9 +17,9 @@ namespace JojaExpress
         public void filter(string word)
         {
             list.Clear();
-            foreach (ISalable salable in originalDic.Keys)
+            foreach (var pair in originalDic)
             {
-                if(salable.DisplayName.Contains(word)) list.Add(salable);
+                if(pair.Key.DisplayName.Contains(word, StringComparison.OrdinalIgnoreCase) && pair.Value.Stock > 0) list.Add(pair.Key);
             }
         }
 

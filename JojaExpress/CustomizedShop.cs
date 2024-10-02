@@ -5,11 +5,12 @@ using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.GameData.Shops;
 using StardewValley.Internal;
+using StardewValley.Inventories;
 using StardewValley.Menus;
 
 namespace JojaExpress
 {
-    public partial class CustomizedShop: IClickableMenu
+    public partial class CustomizedShop : IClickableMenu
     {
         //public List<KeyValuePair<ISalable, ItemStockInformation>> forSale, purchased, currentList;
         Dictionary<ISalable, ItemStockInformation> forSale, purchased;
@@ -18,9 +19,10 @@ namespace JojaExpress
         public Action<List<KeyValuePair<ISalable, ItemStockInformation>>> actionOnClosed;
         public Rectangle scrollBarRunner;
         public int currentItemIndex = 0, hoverPrice = -1, safetyTimer = 250;
-        public int totalMoney {get; set; } = 0;
+        public TextBox searchBox;
+        public int totalMoney { get; set; } = 0;
         public bool scrolling = false, viewingCart = false, viewingNotification;
-        public string shopId, hoverText = "", boldTitleText = "", searchString = "", searchNone, cartNone, checkOutStr, backStr, cartStr, totalStr, searchEmptyStr;
+        public string shopId, hoverText = "", boldTitleText = "", searchNone, cartNone, checkOutStr, backStr, cartStr, totalStr, searchEmptyStr;
         public ISalable? hoveredItem;
         public MoneyDial totalMoneyDial = new(8);
         public Dictionary<string, int> knownPurchased;
@@ -49,8 +51,19 @@ namespace JojaExpress
                 snapToDefaultClickableComponent();
             }
             _setScrollBarToCurrentIndex();
+
+            searchBox = new(ModEntry._Helper.ModContent.Load<Texture2D>("assets/searchBoxTexture"), null, Game1.dialogueFont, Color.Aqua)
+            {
+                X = searchTab.bounds.X + 20,
+                Y = searchTab.bounds.Y,
+                Width = searchTab.bounds.Width - 150,
+                Height = 44,
+                Selected = false
+            };
+            searchBox.OnEnterPressed += (box) => updateSearchBox();
+
             ITranslationHelper trans = ModEntry._Helper.Translation;
-            searchNone = trans.Get("search.none", new { search = searchString });
+            searchNone = trans.Get("search.none", new { search = searchBox.Text });
             cartNone = trans.Get("cart.none");
             cartStr = trans.Get("view_cart");
             backStr = trans.Get("view_shop");
@@ -60,6 +73,14 @@ namespace JojaExpress
 
             totalMoneyDial.currentValue = 0;
             exitFunction = PlayerInteractionHandler.exitMenu;
+        }
+
+        public void updateSearchBox()
+        {
+            ITranslationHelper trans = ModEntry._Helper.Translation;
+            searchNone = trans.Get("search.none", new { search = searchBox.Text });
+            currentList.filter(searchBox.Text);
+            searchBox.Selected = false;
         }
 
         public void checkout_exit()

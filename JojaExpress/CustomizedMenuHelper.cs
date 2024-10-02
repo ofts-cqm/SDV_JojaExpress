@@ -148,12 +148,12 @@ namespace JojaExpress
                 viewingCart = true;
                 currentItemIndex = 0;
                 currentList = new View(purchased);
-                searchString = "";
+                searchBox.Text = "";
                 return;
             }
             if (purchased.Count == 0)
             {
-                checkout_exit();
+                exitThisMenu();
                 return;
             }
             getNotificationStr("unexpClose");
@@ -203,7 +203,7 @@ namespace JojaExpress
                             viewingCart = false;
                             currentItemIndex = 0;
                             currentList = new View(forSale);
-                            searchString = "";
+                            searchBox.Text = "";
                             viewingNotification = false;
                             break;
                         }

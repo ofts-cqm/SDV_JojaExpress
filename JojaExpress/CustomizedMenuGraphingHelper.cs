@@ -35,6 +35,11 @@ namespace JojaExpress
             totalMoneyDial.draw(b, new(xPositionOnScreen + 340, yPositionOnScreen + height - 65), totalMoney);
             b.DrawString(Game1.dialogueFont, totalStr, new(xPositionOnScreen + 20, yPositionOnScreen + 560), Color.Blue);
             //b.DrawString(Game1.dialogueFont, "G" + Game1.player.Money, new(xPositionOnScreen + width - 250, yPositionOnScreen), Color.Brown);
+
+            if (searchBox.Selected) searchBox.Draw(b, false);
+            else if(searchBox.Text != "") b.DrawString(Game1.dialogueFont, searchBox.Text, new Vector2(searchTab.bounds.X + 20, searchTab.bounds.Y + 10), Color.Black * 0.5f);
+            else b.DrawString(Game1.dialogueFont, searchEmptyStr, new Vector2(searchTab.bounds.X + 20, searchTab.bounds.Y + 10), Color.Black * 0.5f);
+
             for (int i = 0; i < 4; i++) drawSlot(i, b);
 
             if (currentList.Count == 0)

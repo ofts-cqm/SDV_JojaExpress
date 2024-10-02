@@ -48,12 +48,13 @@ namespace JojaExpress
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             if (viewingNotification) { _notificationClick(x, y); return; }
+            if (searchBox.Selected) searchBox.Selected = false;
             if (!viewingCart && cartButton.containsPoint(x, y))
             {
                 viewingCart = true;
                 currentItemIndex = 0;
                 currentList = new View(purchased);
-                searchString = "";
+                searchBox.Text = "";
                 return;
             }
             if (viewingCart && backButton.containsPoint(x, y))
@@ -61,7 +62,7 @@ namespace JojaExpress
                 viewingCart = false;
                 currentItemIndex = 0;
                 currentList = new View(forSale);
-                searchString = "";
+                searchBox.Text = "";
                 return;
             }
             if (viewingCart && checkOutButton.containsPoint(x, y))
@@ -74,6 +75,15 @@ namespace JojaExpress
                 _tryCloseMenu();
                 return;
             }
+
+            if (search.containsPoint(x, y)) updateSearchBox();
+            else if(unSearch.containsPoint(x, y))
+            {
+                searchBox.Selected = false;
+                searchBox.Text = "";
+                currentList.filter("");
+            }
+            else if (searchTab.containsPoint(x, y)) searchBox.SelectMe();
 
             //base.receiveLeftClick(x, y, playSound);
             if (downArrow.containsPoint(x, y) && currentItemIndex < Math.Max(0, currentList.Count - 4))
@@ -143,6 +153,7 @@ namespace JojaExpress
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
             if (viewingNotification) return;
+            if (searchBox.Selected) searchBox.Selected = false;
             if (viewingCart) return;
             for (int j = 0; j < forSaleButtons.Length; j++)
             {
@@ -174,7 +185,7 @@ namespace JojaExpress
 
         public override void receiveKeyPress(Keys key)
         {
-            if (viewingNotification) return;
+            if (viewingNotification || searchBox.Selected) return;
             if (key != 0)
             {
                 if (Game1.options.doesInputListContain(Game1.options.menuButton, key) && readyToClose())
