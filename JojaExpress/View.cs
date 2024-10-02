@@ -10,8 +10,8 @@ namespace JojaExpress
 
         public View(Dictionary<ISalable, ItemStockInformation> list)
         {
-            this.list = list.Keys.ToList();
             originalDic = list;
+            this.list = list.Keys.ToList().Where((salable) => originalDic[salable].Stock > 0).ToList();
         }
 
         public void filter(string word)

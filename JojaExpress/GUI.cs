@@ -24,19 +24,20 @@ namespace JojaExpress
         public static PerScreen<GameLocation> targetLocation = new();
         public static PerScreen<bool> needToCheckDialogueBox = new(), returnToHelpPage = new();
 
-        public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Func<ISalable, string> getPostFix)
+        public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Action<List<KeyValuePair<ISalable, ItemStockInformation>>> actionOnClosed)
         {
             if (!DataLoader.Shops(Game1.content).TryGetValue(shopId, out var value)) return;
 
             ShopOwnerData[] source = ShopBuilder.GetCurrentOwners(value).ToArray();
             ShopOwnerData? ownerData = source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone) ?? source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone);
 
-            CustomizedShop menu = new(shopId, value, knownPurchased, (a) => { });
+            CustomizedShop menu = new(shopId, value, knownPurchased, actionOnClosed);
             //JojaShopMenu menu = new(shopId, value, ownerData, knownPurchased, getPostFix);
             //menu.searchBox.Selected = false;
             Game1.activeClickableMenu = menu;
         }
 
+        [Obsolete]
         public static string getPostFixForItem(ISalable item)
         {
             if (ModEntry.tobeReceived.Last().TryGetValue(item.QualifiedItemId, out int amt))
@@ -44,6 +45,7 @@ namespace JojaExpress
             else return "";
         }
 
+        [Obsolete]
         public static string getPostFixForLocalItem(ISalable item)
         {
             if (ModEntry.localReceived.TryGetValue(item.QualifiedItemId, out int amt))
@@ -115,10 +117,10 @@ namespace JojaExpress
 
         public static void checkUI(object? sender, MenuChangedEventArgs e)
         {
-            if (e.OldMenu is CustomizedShop shop && shop.shopId == "ofts.JojaExp.jojaLocal" && ModEntry.localReceived.Count > 0)
-            {
-                sendPackage(Game1.player);
-            }
+            //if (e.OldMenu is CustomizedShop shop && shop.shopId == "ofts.JojaExp.jojaLocal" && ModEntry.localReceived.Count > 0)
+            //{
+            //    sendPackage(Game1.player);
+            //}
             if (PlayerInteractionHandler.Api != null && e.OldMenu is DialogueBox && PlayerInteractionHandler.Api.GetRunningApp() == "Joja Express" && needToCheckDialogueBox.Value)
             {
                 if (returnToHelpPage.Value) PlayerInteractionHandler.handleHelpDisplay();

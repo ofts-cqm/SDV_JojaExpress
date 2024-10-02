@@ -1,8 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 using StardewValley;
-using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
 
 namespace JojaExpress
@@ -19,11 +18,10 @@ namespace JojaExpress
             ScrollBarBackSourceRect = new(403, 383, 6, 6),
             SearchIconSourceRect = new(80, 0, 16, 16),
             CancleSearchSourceRect = new(268, 470, 16, 16);
+        public Action<int> afterNotification;
+        public string[] notificationString = { "", "", "", ""};
 
-        public TemporaryAnimatedSpriteList animations = new TemporaryAnimatedSpriteList();
-        public TemporaryAnimatedSprite poof;
-
-        public void _fillStockInfo(Dictionary<ISalable, ItemStockInformation> stock, Dictionary<string, int> knownPurchased)
+        public void _fillStockInfo(Dictionary<ISalable, ItemStockInformation> stock)
         {
             foreach (KeyValuePair<ISalable, ItemStockInformation> item in stock)
             {
@@ -32,12 +30,6 @@ namespace JojaExpress
                 {
                     if (Game1.player.knowsRecipe(item.Key.Name)) return;
                     item.Key.Stack = 1;
-                }
-
-                if (knownPurchased.TryGetValue(item.Key.QualifiedItemId, out int amt))
-                {
-                    stockInfo.Stock -= amt;
-                    purchased.Add(item.Key, new ItemStockInformation(stockInfo.Price, amt));
                 }
                 if (stockInfo.Stock != 0) forSale.Add(item.Key, item.Value);
             }
@@ -57,7 +49,12 @@ namespace JojaExpress
             moneyTab = new(Rectangle.Empty, "moneyTab");
             search = new(Rectangle.Empty, Game1.mouseCursors, SearchIconSourceRect, 4f);
             unSearch = new(Rectangle.Empty, Game1.mouseCursors, CancleSearchSourceRect, 3f);
-            
+
+            leftOption = new(Rectangle.Empty, PriceTexture, new Rectangle(226, 0, 65, 25), 4f);
+            middleOption = new(Rectangle.Empty, PriceTexture, new Rectangle(226, 0, 65, 25), 4f);
+            rightOption = new(Rectangle.Empty, PriceTexture, new Rectangle(291, 0, 65, 25), 4f);
+            notification = new(Rectangle.Empty, notificationTexture, new Rectangle(0, 0, 64, 48), 14f);
+
             for (int i = 0; i < 4; i++)
             {
                 forSaleButtons[i] = new ClickableComponent(Rectangle.Empty, i.ToString());
@@ -87,6 +84,11 @@ namespace JojaExpress
             moneyTab.bounds = new(xPositionOnScreen, yPositionOnScreen + height - 100, 560, 100);
             search.bounds = new(xPositionOnScreen + width - 260 - 128, yPositionOnScreen, 64, 64);
             unSearch.bounds = new(xPositionOnScreen + width - 260 - 64, yPositionOnScreen, 64, 64);
+
+            notification.bounds = new Rectangle(xPositionOnScreen + width / 2 - 448, yPositionOnScreen + height / 2 - 336, 896, 672);
+            leftOption.bounds = new(notification.bounds.X + 58, notification.bounds.Bottom - 130, 260, 100);
+            middleOption.bounds = new(notification.bounds.X + 318, notification.bounds.Bottom - 130, 260, 100);
+            rightOption.bounds = new(notification.bounds.X + 578, notification.bounds.Bottom - 130, 260, 100);
 
             for (int i = 0; i < 4; i++)
             {
@@ -139,8 +141,6 @@ namespace JojaExpress
             _setScrollBarToCurrentIndex();
         }
 
-        public override bool readyToClose() => animations.Count == 0;
-
         public void _tryCloseMenu()
         {
             if (!viewingCart)
@@ -151,102 +151,93 @@ namespace JojaExpress
                 searchString = "";
                 return;
             }
-            viewingNotification = true;
-            // Todo complete this fuck
+            if (purchased.Count == 0)
+            {
+                checkout_exit();
+                return;
+            }
+            getNotificationStr("unexpClose");
+            afterNotification = (option) =>
+            {
+                switch (option)
+                {
+                    case 0:
+                        {
+                            viewingNotification = false;
+                            break;
+                        }
+                    case 1:
+                        {
+                            exitThisMenu();
+                            break;
+                        }
+                    case 2:
+                        {
+                            _tryCheckOut();
+                            break;
+                        }
+                }
+            };
         }
 
         public void _tryCheckOut()
         {
+            if (Game1.player.Money >= totalMoney)
+            {
+                Game1.player.Money -= totalMoney;
+                checkout_exit();
+                return;
+            }
+            getNotificationStr("noMoney");
+            afterNotification = (option) =>
+            {
+                switch (option)
+                {
+                    case 0:
+                        {
+                            viewingNotification = false;
+                            break;
+                        }
+                    case 1:
+                        {
+                            viewingCart = false;
+                            currentItemIndex = 0;
+                            currentList = new View(forSale);
+                            searchString = "";
+                            viewingNotification = false;
+                            break;
+                        }
+                    case 2:
+                        {
+                            exitThisMenu();
+                            break;
+                        }
+                }
+            };
+        }
+
+        public void getNotificationStr(string key)
+        {
             viewingNotification = true;
-            // Todo complete this fuck
-        }
-
-        public void drawNotification(SpriteBatch b)
-        {
-            // Todo complete this fuck
-        }
-
-        public void drawAnimation(SpriteBatch b)
-        {
-            for (int i = animations.Count - 1; i >= 0; i--)
+            ITranslationHelper helper = ModEntry._Helper.Translation;
+            for(int i = 0; i < 4; i++) 
             {
-                if (animations[i].update(Game1.currentGameTime))
-                {
-                    animations.RemoveAt(i);
-                }
-                else
-                {
-                    animations[i].draw(b, localPosition: true);
-                }
+                notificationString[i] = helper.Get(key + "." + i);
             }
         }
 
-        public void drawSalableIcon(int i, SpriteBatch b, ISalable salable, ItemStockInformation stockInfo)
+        public void _notificationClick(int x, int y)
         {
-            b.Draw(MenuTexture, new Vector2(forSaleButtons[i].bounds.X + 32 - 12, forSaleButtons[i].bounds.Y + 24 - 4), ItemIconBackgroundSourceRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
-            Vector2 vector = new Vector2(forSaleButtons[i].bounds.X + 32 - 8, forSaleButtons[i].bounds.Y + 24);
-            Color color = Color.White;
-            int num = stockInfo.Stock;
-
-            salable.drawInMenu(b, vector, 1f, 1f, 0.9f, StackDrawType.HideButShowQuality, color, drawShadow: true);
-            if (num != int.MaxValue)
-            {
-                Utility.drawTinyDigits(num, b, vector + new Vector2(64 - Utility.getWidthOfTinyDigitString(num, 3f) + 3, 47f), 3f, 1f, color);
-            }
+            if (leftOption.containsPoint(x, y)) { viewingNotification = false; afterNotification.Invoke(0);  return; }
+            if (middleOption.containsPoint(x, y)) { viewingNotification = false; afterNotification.Invoke(1);  return; }
+            if (rightOption.containsPoint(x, y)) { viewingNotification = false; afterNotification.Invoke(2);  return; }
         }
 
-        public void drawSalableName(int i, SpriteBatch b, ISalable salable, ItemStockInformation stockInfo)
+        public void _notificationHover(int x, int y)
         {
-            string text = salable.DisplayName;
-            if (salable.Stack > 1) text = text + " x" + salable.Stack;
-            bool flag2 = stockInfo.Price > 0;
-            if (SpriteText.getWidthOfString(text) > width - (flag2 ? (150 + SpriteText.getWidthOfString(stockInfo.Price + " ")) : 100) && text.Length > (flag2 ? 27 : 37))
-            {
-                text = text.Substring(0, flag2 ? 27 : 37);
-                text += "...";
-            }
-            SpriteText.drawString(b, text, forSaleButtons[i].bounds.X + 96 + 8, forSaleButtons[i].bounds.Y + 28);
-        }
-
-        public void drawSalablePrice(int i, SpriteBatch b, ISalable salable, ItemStockInformation stockInfo)
-        {
-            int num2 = forSaleButtons[i].bounds.Right;
-            if (stockInfo.Price > 0)
-            {
-                SpriteText.drawString(b, stockInfo.Price + " ", num2 - SpriteText.getWidthOfString(stockInfo.Price + " ") - 60, forSaleButtons[i].bounds.Y + 28, alpha: Game1.player.Money >= stockInfo.Price ? 1f : 0.5f);
-                Utility.drawWithShadow(b, Game1.mouseCursors, new Vector2(forSaleButtons[i].bounds.Right - 52, forSaleButtons[i].bounds.Y + 40 - 4), new Rectangle(193, 373, 9, 10), Color.White, 0f, Vector2.Zero, 4f, layerDepth: 1);
-            }
-        }
-
-        public void drawSalableAmount(int i, SpriteBatch b, ISalable salable, ItemStockInformation stockInfo)
-        {
-            priceBG[i].draw(b);
-            pricePlus[i].draw(b);
-            priceMin[i].draw(b);
-            int num = stockInfo.Stock;
-            int numLength = SpriteText.getWidthOfString(num + "");
-            SpriteText.drawString(
-                b, num + "", forSaleButtons[i].bounds.X + 890 + (70 - numLength) / 2, forSaleButtons[i].bounds.Y + 32, color: Color.Gray
-            );
-        }
-
-        public void drawSlot(int i, SpriteBatch b)
-        {
-            if (currentItemIndex + i >= currentList.Count) return;
-
-            drawTextureBox(
-                b, MenuTexture, ItemRowBackgroundSourceRect,
-                forSaleButtons[i].bounds.X, forSaleButtons[i].bounds.Y,
-                forSaleButtons[i].bounds.Width, forSaleButtons[i].bounds.Height,
-                (forSaleButtons[i].containsPoint(Game1.getOldMouseX(), Game1.getOldMouseY()) && !scrolling) ?
-                Color.Wheat : Color.White, 4f, drawShadow: false);
-            ISalable salable = currentList[currentItemIndex + i];
-            ItemStockInformation stockInfo = currentList.getValue(currentItemIndex + i);
-
-            if (salable.ShouldDrawIcon()) drawSalableIcon(i, b, salable, stockInfo);
-            drawSalableName(i, b, salable, stockInfo);
-            if (viewingCart) drawSalableAmount(i, b, salable,stockInfo);
-            else drawSalablePrice(i, b, salable, stockInfo);
+            leftOption.tryHover(x, y);
+            middleOption.tryHover(x, y);
+            rightOption.tryHover(x, y);
         }
     }
 }

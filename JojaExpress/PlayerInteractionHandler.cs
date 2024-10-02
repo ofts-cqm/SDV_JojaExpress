@@ -113,12 +113,12 @@ namespace JojaExpress
                             }
                             ModEntry.localReceived = new();
                             localArrived.Value = false;
-                            GUI.openMenu("ofts.JojaExp.jojaLocal", ModEntry.localReceived, GUI.getPostFixForLocalItem);
+                            GUI.openMenu("ofts.JojaExp.jojaLocal", ModEntry.localReceived, (purchased) => { GUI.sendPackage(Game1.player); });
                             break;
                         }
                     case "global":
                         {
-                            GUI.openMenu("ofts.JojaExp.jojaGlobal", ModEntry.tobeReceived.Last(), GUI.getPostFixForItem);
+                            GUI.openMenu("ofts.JojaExp.jojaGlobal", ModEntry.tobeReceived.Last(), (purchased) => { ModEntry.needMail = true; });
                             break;
                         }
                     case "qi":
