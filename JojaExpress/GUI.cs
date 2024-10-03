@@ -23,8 +23,9 @@ namespace JojaExpress
         public static PerScreen<Vector2> target = new(), current = new();
         public static PerScreen<GameLocation> targetLocation = new();
         public static PerScreen<bool> needToCheckDialogueBox = new(), returnToHelpPage = new();
+        public static List<ItemDeliver> delivers = new();
 
-        public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Action<List<KeyValuePair<ISalable, ItemStockInformation>>> actionOnClosed)
+        public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Action<Dictionary<string, int>> actionOnClosed)
         {
             if (!DataLoader.Shops(Game1.content).TryGetValue(shopId, out var value)) return;
 
@@ -67,6 +68,7 @@ namespace JojaExpress
             else return "x 0";
         }
 
+        [Obsolete]
         public static void dropPackage(SpriteBatch b)
         {
             tick++;
@@ -93,6 +95,15 @@ namespace JojaExpress
 
         public static void drawBird(object? sender, RenderedWorldEventArgs e)
         {
+            for(int i = 0; i < delivers.Count; i++)
+            {
+                if (delivers[i].draw(e.SpriteBatch))
+                {
+                    delivers.RemoveAt(i);
+                    i--;
+                }
+            }
+            /*
             if (current.Value.X < target.Value.X && !droped.Value)
             {
                 dropPackage(e.SpriteBatch);
@@ -112,7 +123,7 @@ namespace JojaExpress
 
             current.Value = new(current.Value.X - 6.4f, current.Value.Y);
 
-            if (current.Value.X < target.Value.X - Game1.viewport.Width) showAnimation.Value = false;
+            if (current.Value.X < target.Value.X - Game1.viewport.Width) showAnimation.Value = false;*/
         }
 
         public static void checkUI(object? sender, MenuChangedEventArgs e)
@@ -137,8 +148,8 @@ namespace JojaExpress
             }
         }
 
-        public static void sendPackage(Farmer who)
-        {
+        public static void sendPackage(IDictionary<string, int> package) => delivers.Add(new(package));
+            /*
             if (showAnimation.Value)
             {
                 StardewValley.Object obj = new("ofts.jojaExp.item.package.local", 1);
@@ -154,7 +165,6 @@ namespace JojaExpress
             current.Value = new(who.Position.X + Game1.viewport.Width, who.Position.Y - Game1.tileSize);
             showAnimation.Value = true;
             droped.Value = false;
-            absTick.Value = 0;
-        }
+            absTick.Value = 0;*/
     }
 }

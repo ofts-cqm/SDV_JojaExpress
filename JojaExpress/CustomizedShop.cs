@@ -17,7 +17,7 @@ namespace JojaExpress
         Dictionary<ISalable, ItemStockInformation> forSale, purchased;
         View currentList;
         public ShopData shopData;
-        public Action<List<KeyValuePair<ISalable, ItemStockInformation>>> actionOnClosed;
+        public Action<Dictionary<string, int>> actionOnClosed;
         public Rectangle scrollBarRunner;
         public int currentItemIndex = 0, hoverPrice = -1, safetyTimer = 250;
         public TextBox searchBox;
@@ -29,7 +29,7 @@ namespace JojaExpress
         public Dictionary<string, int> knownPurchased;
 
         public CustomizedShop(string shopId, ShopData data, Dictionary<string, int> knownPurchased, 
-            Action<List<KeyValuePair<ISalable, ItemStockInformation>>> actionOnClosed)
+            Action<Dictionary<string, int>> actionOnClosed)
         {
             this.shopData = data;
             this.shopId = shopId;
@@ -97,7 +97,7 @@ namespace JojaExpress
                 else knownPurchased.Add(id, p.Value.Stock);
                 Game1.player.team.synchronizedShopStock.OnItemPurchased(shopId, p.Key, forSale, p.Value.Stock);
             }
-            actionOnClosed.Invoke(purchased.ToList());
+            actionOnClosed.Invoke(knownPurchased);
             exitThisMenu();
         }
 

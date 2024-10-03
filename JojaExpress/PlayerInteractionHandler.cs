@@ -113,7 +113,7 @@ namespace JojaExpress
                             }
                             ModEntry.localReceived = new();
                             localArrived.Value = false;
-                            GUI.openMenu("ofts.JojaExp.jojaLocal", ModEntry.localReceived, (purchased) => { GUI.sendPackage(Game1.player); });
+                            GUI.openMenu("ofts.JojaExp.jojaLocal", ModEntry.localReceived, (purchased) => { GUI.sendPackage(purchased); });
                             break;
                         }
                     case "global":
