@@ -171,6 +171,27 @@ namespace JojaExpress
         {
             if (viewingNotification) return;
             base.receiveScrollWheelAction(direction);
+
+            bool handled = false;
+            if (viewingCart)
+            {
+                int x = Game1.getMouseX(), y = Game1.getMouseY();
+                for (int i = 0; i < 4; i++)
+                {
+                    if (!priceBG[i].containsPoint(x, y) 
+                        || priceMin[i].containsPoint(x, y)
+                        || pricePlus[i].containsPoint(x, y)
+                        || currentItemIndex + i >= currentList.Count) 
+                        continue;
+
+                    if (direction > 0) purchaseItem(currentItemIndex + i);
+                    else sellItem(currentItemIndex + i);
+                    handled = true;
+                }
+            }
+
+            if (handled) return;
+
             if (direction > 0 && currentItemIndex > 0)
             {
                 _upArrowPressed();

@@ -14,7 +14,7 @@ namespace JojaExpress
         public ClickableTextureComponent[] priceBG = new ClickableTextureComponent[4],
             pricePlus = new ClickableTextureComponent[4],
             priceMin = new ClickableTextureComponent[4];
-        public Texture2D MenuTexture = Game1.mouseCursors, PriceTexture, notificationTexture;
+        public Texture2D MenuTexture, PriceTexture, notificationTexture;
 
         public override void draw(SpriteBatch b)
         {
@@ -29,7 +29,7 @@ namespace JojaExpress
             drawTextureBox(b, MenuTexture, WindowBorderSourceRect, xPositionOnScreen, yPositionOnScreen + 64, width, 460, Color.White, 4f);
             drawTextureBox(b, MenuTexture, WindowBorderSourceRect, xPositionOnScreen, yPositionOnScreen - 16, width - 250, 80, Color.White, 4f);
             drawTextureBox(b, MenuTexture, WindowBorderSourceRect, xPositionOnScreen + width - 250, yPositionOnScreen - 16, 250, 80, Color.White, 4f);
-            drawTextureBox(b, MenuTexture, WindowBorderSourceRect, xPositionOnScreen, yPositionOnScreen + 524, 560, 110, Color.White, 4f);
+            drawTextureBox(b, MenuTexture, WindowBorderSourceRect, xPositionOnScreen, yPositionOnScreen + 524, 560, 100, Color.White, 4f);
             //Game1.dayTimeMoneyBox.drawMoneyBox(b, xPositionOnScreen - 36, yPositionOnScreen + height - 240);
             Game1.dayTimeMoneyBox.moneyDial.draw(b, new(xPositionOnScreen + width - 220, yPositionOnScreen + 10), Game1.player.Money);
             totalMoneyDial.draw(b, new(xPositionOnScreen + 340, yPositionOnScreen + height - 65), totalMoney);
@@ -161,7 +161,7 @@ namespace JojaExpress
                 forSaleButtons[i].bounds.X, forSaleButtons[i].bounds.Y,
                 forSaleButtons[i].bounds.Width, forSaleButtons[i].bounds.Height,
                 (forSaleButtons[i].containsPoint(Game1.getOldMouseX(), Game1.getOldMouseY()) && !scrolling) ?
-                Color.Wheat : Color.White, 4f, drawShadow: false);
+                Color.Aqua : Color.White, 4f, drawShadow: false);
             ISalable salable = currentList[currentItemIndex + i];
             ItemStockInformation stockInfo = currentList.getValue(currentItemIndex + i);
 

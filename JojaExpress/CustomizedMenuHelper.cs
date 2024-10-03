@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
@@ -9,13 +10,13 @@ namespace JojaExpress
     public partial class CustomizedShop : IClickableMenu
     {
         public const string openMenuSound = "dwop", purchaseSound = "purchaseClick", purchaseRepeatSound = "purchaseRepeat";
-        public readonly Rectangle WindowBorderSourceRect = new(384, 373, 18, 18), 
-            ItemRowBackgroundSourceRect = new(384, 396, 15, 15), 
-            ItemIconBackgroundSourceRect = new(296, 363, 18, 18),
-            ScrollUpSourceRect = new(421, 459, 11, 12),
-            ScrollDownSourceRect = new(421, 472, 11, 12),
-            ScrollBarFrontSourceRect = new(435, 463, 6, 10),
-            ScrollBarBackSourceRect = new(403, 383, 6, 6),
+        public readonly Rectangle WindowBorderSourceRect = new(18, 0, 18, 18), 
+            ItemRowBackgroundSourceRect = new(36, 0, 15, 15), 
+            ItemIconBackgroundSourceRect = new(0, 0, 18, 18),
+            ScrollUpSourceRect = new(51, 0, 11, 12),
+            ScrollDownSourceRect = new(51, 12, 11, 12),
+            ScrollBarFrontSourceRect = new(62, 0, 6, 10),
+            ScrollBarBackSourceRect = new(0, 18, 6, 6),
             SearchIconSourceRect = new(80, 0, 16, 16),
             CancleSearchSourceRect = new(268, 470, 16, 16);
         public Action<int> afterNotification;
@@ -37,6 +38,8 @@ namespace JojaExpress
 
         public void InitClickableComponents()
         {
+            MenuTexture = ModEntry._Helper.ModContent.Load<Texture2D>("assets/menu");
+
             upperRightCloseButton = new(Rectangle.Empty, Game1.mouseCursors, new Rectangle(337, 494, 12, 12), 4f);
             upArrow = new(Rectangle.Empty, MenuTexture, ScrollUpSourceRect, 4f);
             downArrow = new(Rectangle.Empty, MenuTexture, ScrollDownSourceRect, 4f);
@@ -77,9 +80,9 @@ namespace JojaExpress
             scrollBar.bounds = new(upArrow.bounds.X + 12, upArrow.bounds.Y + upArrow.bounds.Height + 4, 24, 40);
             scrollBarRunner = new(scrollBar.bounds.X, upArrow.bounds.Y + upArrow.bounds.Height + 4, scrollBar.bounds.Width, height - 220);
 
-            cartButton.bounds = new(xPositionOnScreen + 560, yPositionOnScreen + height - 100, 520, 100);
-            checkOutButton.bounds = new(xPositionOnScreen + 820, yPositionOnScreen + height - 100, 260, 100);
-            backButton.bounds = new(xPositionOnScreen + 560, yPositionOnScreen + height - 100, 260, 100);
+            cartButton.bounds = new(xPositionOnScreen + 560, yPositionOnScreen + height - 106, 520, 100);
+            checkOutButton.bounds = new(xPositionOnScreen + 820, yPositionOnScreen + height - 106, 260, 100);
+            backButton.bounds = new(xPositionOnScreen + 560, yPositionOnScreen + height - 106, 260, 100);
             searchTab.bounds = new(xPositionOnScreen, yPositionOnScreen, width, 64);
             moneyTab.bounds = new(xPositionOnScreen, yPositionOnScreen + height - 100, 560, 100);
             search.bounds = new(xPositionOnScreen + width - 260 - 128, yPositionOnScreen, 64, 64);
@@ -99,7 +102,7 @@ namespace JojaExpress
             }
         }
 
-        public int _getPurchaseAmount(int itemIndex)
+        public int _getPurchaseAmount(int itemIndex, Dictionary<ISalable, ItemStockInformation> shop)
         {
             if (!Game1.oldKBState.IsKeyDown(Keys.LeftShift)) return 1;
             int currentVal;
@@ -107,7 +110,7 @@ namespace JojaExpress
                 currentVal = Game1.oldKBState.IsKeyDown(Keys.D1) ? 999 : 25;
             else currentVal = 5;
 
-            currentVal = Math.Min(currentVal, Math.Max(1, forSale[currentList[itemIndex]].Stock));
+            currentVal = Math.Min(currentVal, Math.Max(1, shop[currentList[itemIndex]].Stock));
             currentVal = Math.Min(currentVal, currentList[itemIndex].maximumStackSize());
             if (currentVal == -1) currentVal = 1;
 

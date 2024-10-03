@@ -7,6 +7,7 @@ using StardewValley.GameData.Shops;
 using StardewValley.Internal;
 using StardewValley.Inventories;
 using StardewValley.Menus;
+using System;
 
 namespace JojaExpress
 {
@@ -100,11 +101,11 @@ namespace JojaExpress
             exitThisMenu();
         }
 
-        public void purchaseItem(int index)
+        public void purchaseItem(int index, int amount = -1)
         {
             if (!forSale.TryGetValue(currentList[index], out var stock)) return;
 
-            int amount = _getPurchaseAmount(index);
+            if(amount == -1) amount = _getPurchaseAmount(index, forSale);
             ISalable salable = currentList[index];
             totalMoney += amount * stock.Price;
             if (stock.Stock != int.MaxValue) 
@@ -124,11 +125,11 @@ namespace JojaExpress
             if (stock.Stock == 0) currentList.RemoveAt(index);
         }
 
-        public void sellItem(int index)
+        public void sellItem(int index, int amount = -1)
         {
             if (!purchased.TryGetValue(currentList[index], out var stock)) return;
 
-            int amount = _getPurchaseAmount(index);
+            if (amount == -1) amount = _getPurchaseAmount(index, purchased);
             ISalable salable = currentList[index];
             totalMoney -= amount * stock.Price;
             stock.Stock -= amount;
