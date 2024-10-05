@@ -185,7 +185,6 @@ namespace JojaExpress
         public void sendLocalPackage(IDictionary<string, int> products, Farmer who)
         {
             GUI.sendPackage(products);
-            //ModEntry.localReceived = new Dictionary<string, int>(products);
         }
 
         public void sendLocalPackage(IDictionary<ISalable, int> products, Farmer who)

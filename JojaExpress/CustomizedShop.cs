@@ -73,7 +73,7 @@ namespace JojaExpress
             searchEmptyStr = trans.Get("emptySearch");
 
             totalMoneyDial.currentValue = 0;
-            exitFunction = () => { PlayerInteractionHandler.exitMenu(); PlayerInteractionHandler.localArrived.Value = true; };
+            exitFunction = PlayerInteractionHandler.exitMenu;
         }
 
         public void updateSearchBox()

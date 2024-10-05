@@ -10,7 +10,7 @@ namespace JojaExpress
     public class PlayerInteractionHandler
     {
         public static IMobilePhoneApi Api;
-        public static PerScreen<bool> isAppRunning = new(), isJPadRunning = new(), localArrived = new();
+        public static PerScreen<bool> isAppRunning = new(), isJPadRunning = new();
 
         public static void checkInv(object? sender, InventoryChangedEventArgs args)
         {
@@ -30,9 +30,15 @@ namespace JojaExpress
 
         public static void handlePhone()
         {
-            if (Api == null || Api.IsCallingNPC() || Api.GetAppRunning()) return;
-            Api.SetAppRunning(true);
-            Api.SetRunningApp("Joja Express");
+            if (isJPadRunning.Value) { }
+            else if (!(Api == null || Api.IsCallingNPC() || Api.GetAppRunning()))
+            {
+                Api.SetAppRunning(true);
+                Api.SetRunningApp("Joja Express");
+                isAppRunning.Value = true;
+            }
+            else return;
+            
             MobilePhoneRender.setBG("question");
             MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 30, 60, 250, 120, Game1.dialogueFont));
             MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
@@ -45,7 +51,6 @@ namespace JojaExpress
             MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 230, 152, 210, 60, null, true));
             MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 230, 203, 210, 60, null, true));
             openMenu();
-            isAppRunning.Value = true;
         }
 
         public static void sendMail(object? sender, DayEndingEventArgs e)
@@ -102,17 +107,7 @@ namespace JojaExpress
                 {
                     case "local":
                         {
-                            if (!localArrived.Value)
-                            {
-                                Game1.multipleDialogues(ModEntry._Helper.Translation.Get("wait").ToString().Split('$'));
-                                Game1.delayedActions.Add(
-                                    new DelayedAction(20, () => { GUI.needToCheckDialogueBox.Value = true; })
-                                    );
-                                handleNoteDisplay();
-                                break;
-                            }
                             ModEntry.localReceived = new();
-                            localArrived.Value = false;
                             GUI.openMenu("ofts.JojaExp.jojaLocal", ModEntry.localReceived, (purchased) => { GUI.sendPackage(purchased); });
                             break;
                         }
@@ -214,15 +209,58 @@ namespace JojaExpress
             {
                 Api.SetAppRunning(false);
                 isAppRunning.Value = false;
-                MobilePhoneRender.protrait.Clear();
-                MobilePhoneRender.landscape.Clear();
             }
             else if (isJPadRunning.Value)
             {
                 isJPadRunning.Value = false;
-                MobilePhoneRender.protrait.Clear();
-                MobilePhoneRender.landscape.Clear();
             }
+            MobilePhoneRender.protrait.Clear();
+            MobilePhoneRender.landscape.Clear();
+        }
+
+        public static void unpack()
+        {
+            bool cookingLearned = false, craftingLearned = false;
+            foreach (KeyValuePair<string, NetString> p in Game1.player.ActiveObject.modData.FieldDict)
+            {
+                try
+                {
+                    bool isRecipe = p.Key.StartsWith("rcp");
+                    string id = p.Key;
+                    if (isRecipe) id = p.Key.Substring(3);
+                    Item? sampleItem = ItemRegistry.Create(id);
+                    string shopId = $"ofts.JojaExp.joja{(Game1.player.ActiveObject.QualifiedItemId.EndsWith("local") ? "Local" : "Global")}";
+                    bool discard = sampleItem.actionWhenPurchased(shopId);
+                    if (sampleItem is not null && (isRecipe || discard))
+                    {
+                        string key = sampleItem.Name;
+                        if (sampleItem is Item obj && obj.Category == -7)
+                        {
+                            Game1.player.cookingRecipes.Add(key, 0);
+                            cookingLearned = true;
+                        }
+                        else
+                        {
+                            Game1.player.craftingRecipes.Add(key, 0);
+                            craftingLearned = true;
+                        }
+                        Game1.playSound("newRecipe");
+                        continue;
+                    }
+
+                    for (int cnt = int.Parse(p.Value.Value); cnt > 0; cnt -= 999)
+                    {
+                        Game1.currentLocation.debris.Add(Game1.createItemDebris(ItemRegistry.Create(p.Key, Math.Min(cnt, 999)), Game1.player.Position, 0));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModEntry._Monitor.Log($"JojaExp cannot unpack the following item: \n{ex}", LogLevel.Error);
+                }
+            }
+            if (cookingLearned) Game1.addHUDMessage(new HUDMessage(ModEntry._Helper.Translation.Get("newCooking")));
+            if (craftingLearned) Game1.addHUDMessage(new HUDMessage(ModEntry._Helper.Translation.Get("newCrafting")));
+            Game1.player.reduceActiveItemByOne();
         }
 
         public static void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
@@ -244,6 +282,7 @@ namespace JojaExpress
                     break;
                 }
             }
+
             foreach (InputButton key in Game1.options.useToolButton)
             {
                 if (e.IsDown(key.ToSButton()))
@@ -253,40 +292,12 @@ namespace JojaExpress
                 }
             }
             if (!found) return;
+
             if (Game1.player.ActiveObject != null && (
                 Game1.player.ActiveObject.QualifiedItemId == "(O)ofts.jojaExp.item.package.global" ||
                 Game1.player.ActiveObject.QualifiedItemId == "(O)ofts.jojaExp.item.package.local"))
             {
-                foreach (KeyValuePair<string, NetString> p in Game1.player.ActiveObject.modData.FieldDict)
-                {
-                    try
-                    {
-                        bool isRecipe = p.Key.StartsWith("rcp");
-                        string id = p.Key;
-                        if (isRecipe) id = p.Key.Substring(3);
-                        Item? sampleItem = ItemRegistry.Create(id);
-                        string shopId = $"ofts.JojaExp.joja{(Game1.player.ActiveObject.QualifiedItemId.EndsWith("local") ? "Local" : "Global")}";
-                        bool discard = sampleItem.actionWhenPurchased(shopId);
-                        if (sampleItem is not null && (isRecipe || discard))
-                        {
-                            string key = sampleItem.Name;
-                            if (sampleItem is Item obj && obj.Category == -7) Game1.player.cookingRecipes.Add(key, 0);
-                            else Game1.player.craftingRecipes.Add(key, 0);
-                            Game1.playSound("newRecipe");
-                            continue;
-                        }
-
-                        for (int cnt = int.Parse(p.Value.Value); cnt > 0; cnt -= 999)
-                        {
-                            Game1.currentLocation.debris.Add(Game1.createItemDebris(ItemRegistry.Create(p.Key, Math.Min(cnt, 999)), Game1.player.Position, 0));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ModEntry._Monitor.Log($"JojaExp cannot unpack the following item: \n{ex}", LogLevel.Error);
-                    }
-                }
-                Game1.player.reduceActiveItemByOne();
+                unpack();
             }
             else if (Game1.player.ActiveItem != null && ModEntry.config != null && ModEntry.config.OpenByPad &&
                 Game1.player.ActiveItem.QualifiedItemId == "(T)ofts.jojaExp.item.jpad" && 
@@ -294,18 +305,7 @@ namespace JojaExpress
                 Context.IsWorldReady && Game1.activeClickableMenu == null)
             {
                 isJPadRunning.Value = true;
-                MobilePhoneRender.setBG("question");
-                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 30, 60, 250, 120, Game1.dialogueFont));
-                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
-                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 35, 255, 210, 60, null, true));
-                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 35, 306, 210, 60, null, true));
-                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 35, 363, 210, 60, null, true));
-                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 55, 35, 150, 190, Game1.dialogueFont));
-                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 230, 50, 210, 60, null, true));
-                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 230, 101, 210, 60, null, true));
-                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 230, 152, 210, 60, null, true));
-                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 230, 203, 210, 60, null, true));
-                openMenu();
+                handlePhone();
             }
         }
     }

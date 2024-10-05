@@ -48,8 +48,17 @@ namespace JojaExpress
 
             current.X -= 6.4f;
 
-            if (current.X - Game1.viewport.X < -24) 
-                return true;
+            if (current.X - Game1.viewport.X < -24)
+            {
+                if (droped) return true;
+                StardewValley.Object obj = new("ofts.jojaExp.item.package.local", 1);
+                foreach (KeyValuePair<string, int> p in toBeDelivered)
+                {
+                    obj.modData.Add(p.Key, p.Value.ToString());
+                }
+                targetLocation.debris.Add(Game1.createItemDebris(obj, target, 0));
+                droped = true;
+            }
             return false;
         }
 

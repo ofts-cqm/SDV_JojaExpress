@@ -65,7 +65,33 @@ namespace JojaExpress
                 priceMin[i] = new ClickableTextureComponent(Rectangle.Empty, PriceTexture, new Rectangle(6, 6, 20, 20), 2f);
                 pricePlus[i] = new ClickableTextureComponent(Rectangle.Empty, PriceTexture, new Rectangle(70, 6, 20, 20), 2f);
             }
+
+            MobilePhoneRender.setBG("shop");
+            MobilePhoneRender.protrait.Clear();
+            MobilePhoneRender.landscape.Clear();
+
+
+            Func<ISalable?>[] funcs = new[] {func1, func2, func3, func4 };
+            Func<ItemStockInformation?>[] funcs2 = new[] { func5, func6, func7, func8 };
+            for (int i = 0; i < 4; i++)
+            {
+                MobilePhoneRender.protrait.Add(new TexturedRenderPack(funcs[i], 35 - 16, 61 + 100 * i - 16, 0.5f));
+                MobilePhoneRender.protrait.Add(new VolatileRenderPack(funcs[i], 35, 100 + 100 * i, 220, 55, Game1.dialogueFont));
+                MobilePhoneRender.protrait.Add(new VolatileRenderPack(funcs2[i], 200, 65 + 100 * i, 100, 50, null));
+                MobilePhoneRender.landscape.Add(new TexturedRenderPack(funcs[i], 64 - 16, 38 + 59 * i - 16, 0.5f));
+                MobilePhoneRender.landscape.Add(new VolatileRenderPack(funcs[i], 100, 38 + 59 * i, 290, 55, Game1.dialogueFont));
+                MobilePhoneRender.landscape.Add(new VolatileRenderPack(funcs2[i], 390, 38 + 59 * i, 100, 50, null));
+            }
         }
+
+        public ISalable? func1() => currentList.Count > currentItemIndex ? currentList[currentItemIndex] : null;
+        public ISalable? func2() => currentList.Count > currentItemIndex + 1 ? currentList[currentItemIndex + 1] : null;
+        public ISalable? func3() => currentList.Count > currentItemIndex + 2 ? currentList[currentItemIndex + 2] : null;
+        public ISalable? func4() => currentList.Count > currentItemIndex + 3 ? currentList[currentItemIndex + 3] : null;
+        public ItemStockInformation? func5() => currentList.Count > currentItemIndex ? currentList.getValue(currentItemIndex) : null;
+        public ItemStockInformation? func6() => currentList.Count > currentItemIndex + 1 ? currentList.getValue(currentItemIndex + 1) : null;
+        public ItemStockInformation? func7() => currentList.Count > currentItemIndex + 2 ? currentList.getValue(currentItemIndex + 2) : null;
+        public ItemStockInformation? func8() => currentList.Count > currentItemIndex + 3 ? currentList.getValue(currentItemIndex + 3) : null;
 
         public void _updatePosition()
         {

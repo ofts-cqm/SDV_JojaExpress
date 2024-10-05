@@ -47,7 +47,7 @@ namespace JojaExpress
             config = this.Helper.ReadConfig<ModConfig>();
             Instance = this;
             postfix = Helper.Translation.Get("postfix");
-            GUI.birdTexture = Helper.GameContent.Load<Texture2D>("LooseSprites\\parrots");
+            //GUI.birdTexture = Helper.GameContent.Load<Texture2D>("LooseSprites\\parrots");
             _Helper = helper;
             _Monitor = Monitor;
             Phone.PhoneHandlers.Add(new JojaPhoneHandler());
@@ -136,7 +136,6 @@ namespace JojaExpress
         public void load(object? sender,EventArgs e)
         {
             checkFeeState();
-            PlayerInteractionHandler.localArrived.Value = true;
 
             if(!Context.IsMainPlayer)
             {
@@ -158,9 +157,8 @@ namespace JojaExpress
             }
 
             needMail = false;
-            GUI.showAnimation.Value = false;
+            //GUI.showAnimation.Value = false;
         }
-
         
 
         public void save(object? sender, SavingEventArgs e)
@@ -173,7 +171,7 @@ namespace JojaExpress
         public void initNewDay(object? sender, EventArgs e)
         {
             checkFeeState();
-            GUI.showAnimation.Value = false;
+            //GUI.showAnimation.Value = false;
             if (Context.IsSplitScreen && Context.ScreenId != 0) return;
             if (tobeReceived == null) tobeReceived = new() { new()};
             if (tobeReceived.Count == 0 || tobeReceived.Last().Count != 0) tobeReceived.Add(new());

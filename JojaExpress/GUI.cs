@@ -1,16 +1,14 @@
 ﻿using StardewValley;
 using StardewValley.GameData.Shops;
 using StardewValley.Internal;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
-using Microsoft.Xna.Framework;
-using StardewValley.Menus;
 
 namespace JojaExpress
 {
     public class GUI
     {
+        /*
         public static Rectangle[] boxes = new Rectangle[] {
             new(48, 96, 24, 24),
             new(72, 96, 24, 24),
@@ -21,7 +19,7 @@ namespace JojaExpress
         public static Texture2D birdTexture;
         public static PerScreen<bool> showAnimation = new(), droped = new();
         public static PerScreen<Vector2> target = new(), current = new();
-        public static PerScreen<GameLocation> targetLocation = new();
+        public static PerScreen<GameLocation> targetLocation = new();*/
         public static PerScreen<bool> needToCheckDialogueBox = new(), returnToHelpPage = new();
         public static List<ItemDeliver> delivers = new();
 
@@ -33,8 +31,6 @@ namespace JojaExpress
             ShopOwnerData? ownerData = source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone) ?? source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone);
 
             CustomizedShop menu = new(shopId, value, knownPurchased, actionOnClosed);
-            //JojaShopMenu menu = new(shopId, value, ownerData, knownPurchased, getPostFix);
-            //menu.searchBox.Selected = false;
             Game1.activeClickableMenu = menu;
         }
 
@@ -68,7 +64,7 @@ namespace JojaExpress
             else return "x 0";
         }
 
-        [Obsolete]
+        /*[Obsolete]
         public static void dropPackage(SpriteBatch b)
         {
             tick++;
@@ -82,7 +78,6 @@ namespace JojaExpress
                     obj.modData.Add(p.Key, p.Value.ToString());
                 }
                 targetLocation.Value.debris.Add(Game1.createItemDebris(obj, target.Value, 0));
-                PlayerInteractionHandler.localArrived.Value = true;
             }
             if (tick == 120) droped.Value = true;
 
@@ -91,7 +86,7 @@ namespace JojaExpress
                 new Vector2(current.Value.X - Game1.viewport.X, current.Value.Y - Game1.viewport.Y
                 + (float)(Math.Sin(absTick.Value / 10) * 16)),
                 boxes[index], Color.White, 0, Vector2.Zero, 4f, SpriteEffects.None, 2.8f);
-        }
+        }*/
 
         public static void drawBird(object? sender, RenderedWorldEventArgs e)
         {
@@ -103,43 +98,11 @@ namespace JojaExpress
                     i--;
                 }
             }
-            /*
-            if (current.Value.X < target.Value.X && !droped.Value)
-            {
-                dropPackage(e.SpriteBatch);
-                return;
-            }
-
-            if (!showAnimation.Value) return;
-            tick++;
-            absTick.Value++;
-            if (tick >= 10) { tick = 0; index++; index %= 3; }
-
-            if (Game1.currentLocation == targetLocation.Value)
-                e.SpriteBatch.Draw(birdTexture,
-                    new Vector2(current.Value.X - Game1.viewport.X, current.Value.Y - Game1.viewport.Y
-                    + (float)(Math.Sin(absTick.Value / 10) * 16)),
-                    boxes[index], Color.White, 0, Vector2.Zero, 4f, SpriteEffects.None, 2.8f);
-
-            current.Value = new(current.Value.X - 6.4f, current.Value.Y);
-
-            if (current.Value.X < target.Value.X - Game1.viewport.Width) showAnimation.Value = false;*/
         }
 
         public static void checkUI(object? sender, MenuChangedEventArgs e)
         {
-            //if (e.OldMenu is CustomizedShop shop && shop.shopId == "ofts.JojaExp.jojaLocal" && ModEntry.localReceived.Count > 0)
-            //{
-            //    sendPackage(Game1.player);
-            //}
-            /*if (PlayerInteractionHandler.Api != null && e.OldMenu is DialogueBox && PlayerInteractionHandler.Api.GetRunningApp() == "Joja Express" && needToCheckDialogueBox.Value)
-            {
-                if (returnToHelpPage.Value) PlayerInteractionHandler.handleHelpDisplay();
-                else PlayerInteractionHandler.exitMenu();
-                needToCheckDialogueBox.Value = false;
-                returnToHelpPage.Value = false;
-            }
-            else*/ if (needToCheckDialogueBox.Value)
+            if (needToCheckDialogueBox.Value)
             {
                 if (returnToHelpPage.Value) PlayerInteractionHandler.handleHelpDisplay();
                 else PlayerInteractionHandler.exitMenu();
@@ -149,22 +112,5 @@ namespace JojaExpress
         }
 
         public static void sendPackage(IDictionary<string, int> package) => delivers.Add(new(package));
-            /*
-            if (showAnimation.Value)
-            {
-                StardewValley.Object obj = new("ofts.jojaExp.item.package.local", 1);
-                foreach (KeyValuePair<string, int> p in ModEntry.localReceived)
-                {
-                    obj.modData.Add(p.Key, p.Value.ToString());
-                }
-                targetLocation.Value.debris.Add(Game1.createItemDebris(obj, target.Value, 0));
-            }
-
-            targetLocation.Value = who.currentLocation;
-            target.Value = new(who.Position.X, who.Position.Y - Game1.tileSize);
-            current.Value = new(who.Position.X + Game1.viewport.Width, who.Position.Y - Game1.tileSize);
-            showAnimation.Value = true;
-            droped.Value = false;
-            absTick.Value = 0;*/
     }
 }

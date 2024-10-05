@@ -74,10 +74,10 @@ namespace JojaExpress
             {
                 MobilePhoneRender.protrait.Add(new TexturedRenderPack(funcs[i], 35 - 16, 61 + 100 * i - 16, 0.5f));
                 MobilePhoneRender.protrait.Add(new VolatileRenderPack(funcs[i], 35, 100 + 100 * i, 220, 55, Game1.dialogueFont));
-                MobilePhoneRender.protrait.Add(new VolatileRenderPack(postfixOnPhone, funcs[i], 200, 65 + 100 * i, 100, 50, null));
+                //MobilePhoneRender.protrait.Add(new VolatileRenderPack(postfixOnPhone, funcs[i], 200, 65 + 100 * i, 100, 50, null));
                 MobilePhoneRender.landscape.Add(new TexturedRenderPack(funcs[i], 64 - 16, 38 + 59 * i - 16, 0.5f));
                 MobilePhoneRender.landscape.Add(new VolatileRenderPack(funcs[i], 100, 38 + 59 * i, 290, 55, Game1.dialogueFont));
-                MobilePhoneRender.landscape.Add(new VolatileRenderPack(postfixOnPhone, funcs[i], 390, 38 + 59 * i, 100, 50, null));
+                //MobilePhoneRender.landscape.Add(new VolatileRenderPack(postfixOnPhone, funcs[i], 390, 38 + 59 * i, 100, 50, null));
             }
             currentOption = ModEntry._Helper.Translation.Get("view_cart");
 

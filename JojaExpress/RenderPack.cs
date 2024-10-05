@@ -12,12 +12,12 @@ namespace JojaExpress
 
     public class TexturedRenderPack : IRenderPack
     {
-        Func<ISalable> texture;
+        Func<ISalable?> texture;
         int x, y;
         float scale;
         bool drawShadow;
 
-        public TexturedRenderPack(Func<ISalable> texture, int x, int y, float scale = 1, bool drawShadow = false) 
+        public TexturedRenderPack(Func<ISalable?> texture, int x, int y, float scale = 1, bool drawShadow = false) 
         {
             this.texture = texture;
             this.x = x;
@@ -28,7 +28,7 @@ namespace JojaExpress
 
         public void draw(SpriteBatch sb, int xOff, int yOff)
         {
-            texture.Invoke().drawInMenu(sb, new Vector2(x + xOff, y + yOff), scale, 1f,0.9f, StackDrawType.Hide, Color.White, drawShadow);
+            texture.Invoke()?.drawInMenu(sb, new Vector2(x + xOff, y + yOff), scale, 1f,0.9f, StackDrawType.Hide, Color.White, drawShadow);
         }
     }
 
@@ -50,28 +50,28 @@ namespace JojaExpress
             this.middle = middle;
         }
 
-        public VolatileRenderPack(Func<ISalable> displayStr, int x, int y, int width, int height, SpriteFont? font, bool middle = false)
+        public VolatileRenderPack(Func<ISalable?> displayStr, int x, int y, int width, int height, SpriteFont? font)
         {
+            this.displayStr = () => displayStr.Invoke()?.DisplayName ?? "---------";
             if (font == null) font = Game1.smallFont;
-            this.displayStr = () => displayStr.Invoke().DisplayName;
             this.x = x;
             this.y = y;
             this.w = width;
             this.h = height;
             this.font = font;
-            this.middle = middle;
+            this.middle = false;
         }
 
-        public VolatileRenderPack(Func<ISalable, string> func, Func<ISalable> displayStr, int x, int y, int width, int height, SpriteFont? font, bool middle = false)
+        public VolatileRenderPack(Func<ItemStockInformation?> displayStr, int x, int y, int width, int height, SpriteFont? font)
         {
+            this.displayStr = () => displayStr.Invoke()?.Price.ToString() ?? "-----";
             if (font == null) font = Game1.smallFont;
-            this.displayStr = () => func.Invoke(displayStr.Invoke());
             this.x = x;
             this.y = y;
             this.w = width;
             this.h = height;
             this.font = font;
-            this.middle = middle;
+            this.middle = false;
         }
 
         public void draw(SpriteBatch sb, int xOff, int yOff)
