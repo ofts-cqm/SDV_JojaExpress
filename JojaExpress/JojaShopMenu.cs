@@ -69,7 +69,7 @@ namespace JojaExpress
                 () => forSale[currentItemIndex + 2],
                 () => forSale[currentItemIndex + 3]
             };
-            Func<ISalable, string> postfixOnPhone = shopId == "ofts.JojaExp.jojaLocal" ? GUI.getPostFixForLocalItemOnPhone : GUI.getPostFixForItemOnPhone;
+            //Func<ISalable, string> postfixOnPhone = shopId == "ofts.JojaExp.jojaLocal" ? GUI.getPostFixForLocalItemOnPhone : GUI.getPostFixForItemOnPhone;
             for (int i = 0; i < 4; i++)
             {
                 MobilePhoneRender.protrait.Add(new TexturedRenderPack(funcs[i], 35 - 16, 61 + 100 * i - 16, 0.5f));
