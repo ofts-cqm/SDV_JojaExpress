@@ -5,6 +5,7 @@ using StardewModdingAPI.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using GenericModConfigMenu;
 using StardewValley.Objects;
+using System.Reflection.Metadata;
 
 namespace JojaExpress
 {
@@ -51,6 +52,60 @@ namespace JojaExpress
             _Helper = helper;
             _Monitor = Monitor;
             Phone.PhoneHandlers.Add(new JojaPhoneHandler());
+            ItemRegistry.AddTypeDefinition(PackedItem.definition = new PackedItemDefinition());
+            PackedItem.PackageTexture = Helper.ModContent.Load<Texture2D>("assets/objects");
+            helper.ConsoleCommands.Add("zip", 
+                "pack certain type of item to a \"Packed Item\"\n\n" +
+                "Usage: zip <id> <level> [quantity]\n" +
+                " - id: the qualified item id. Must be object\n" +
+                " - level: amount of items packed. 0 for 25, 1 for 100, 2 for 999.\n" +
+                " - quantity: how many packed items to send", 
+                this.PackItem);
+        }
+
+        public void PackItem(string command, string[] args)
+        {
+            if (!Context.IsWorldReady)
+            {
+                Monitor.Log("Must be called after a save is loaded", LogLevel.Error);
+                return;
+            }
+            if (args.Length < 2 || args.Length > 3)
+            {
+                Monitor.Log("Usage: zip <id> <level> [quantity]\n" +
+                " - id: the qualified or unqualified item id\n" +
+                " - level: amount of items packed. 0 for 25, 1 for 100, 2 for 999.\n" +
+                " - quantity: how many packed items to send", LogLevel.Error);
+                return;
+            }
+            if (ItemRegistry.IsQualifiedItemId(args[0]))
+            {
+                args[1].Substring(3).TrimStart();
+                Monitor.Log("Command is called with a qualified item id. Auto fixed", LogLevel.Warn);
+            }
+            if (!Game1.objectData.ContainsKey(args[0]))
+            {
+                Monitor.Log("Id must represent a valid object", LogLevel.Error);
+                return;
+            }
+            if (!int.TryParse(args[1], out int level) || level > 2 || level < 0)
+            {
+                Monitor.Log("Level must be a number between 0 - 2", LogLevel.Error);
+                return;
+            }
+
+            int stack = 1;
+            if(args.Length > 2 && !int.TryParse(args[2], out stack))
+                Monitor.Log("Quantity must be an integer. Ignored", LogLevel.Warn);
+
+            if(!Game1.player.addItemToInventoryBool(new PackedItem("_" + args[0], stack, level)))
+            {
+                Monitor.Log("No empty space to add new items", LogLevel.Warn);
+            }
+            else
+            {
+                Monitor.Log("Successfully added Packed Item to player's inventory", LogLevel.Info);
+            }
         }
 
         public override object? GetApi()
@@ -73,6 +128,17 @@ namespace JojaExpress
                 Monitor.Log($"loaded phone app successfully: {success}", LogLevel.Info);
                 PlayerInteractionHandler.Api = mobileMenu;
                 MobilePhoneRender.init(mobileMenu);
+            }
+
+            var spaceCore = Helper.ModRegistry.GetApi<ISpaceCoreAPI>("spacechase0.SpaceCore");
+            if (spaceCore == null)
+            {
+                Monitor.Log("JojaExpress requires SpaceCore", LogLevel.Error);
+                throw new Exception("SpaceCore not found");
+            }
+            else
+            {
+                spaceCore.RegisterSerializerType(typeof(PackedItem));
             }
         }
 
@@ -198,5 +264,10 @@ namespace JojaExpress
         public bool EnableCommunity { get; set;} = true;
         public bool EnableGlobal { get; set; } = true;
         public bool EnableQi { get; set; } = true;
+    }
+
+    public interface ISpaceCoreAPI
+    {
+        void RegisterSerializerType(Type type);
     }
 }

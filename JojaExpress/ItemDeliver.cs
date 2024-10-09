@@ -13,19 +13,21 @@ namespace JojaExpress
             new(96, 96, 24, 24),
         };
 
-        public IDictionary<string, int> toBeDelivered;
+        public IDictionary<ISalable, ItemStockInformation> toBeDelivered;
         public GameLocation targetLocation;
         public Vector2 target, current;
         public int tick = 0, absTick = 0, index = 0;
         public bool droped = false;
+        public string packageId;
 
-        public ItemDeliver(IDictionary<string, int> toBeDelivered)
+        public ItemDeliver(IDictionary<ISalable, ItemStockInformation> toBeDelivered, string packageId)
         {
             this.toBeDelivered = toBeDelivered;
             targetLocation = Game1.currentLocation;
             target = new(Game1.player.Position.X, Game1.player.Position.Y - Game1.tileSize);
             current = new Vector2(Game1.viewport.Width + 300, target.Y);
             birdTexture ??= ModEntry._Helper.GameContent.Load<Texture2D>("LooseSprites\\parrots");
+            this.packageId = packageId;
         }
 
         public bool draw(SpriteBatch b)
@@ -51,12 +53,12 @@ namespace JojaExpress
             if (current.X - Game1.viewport.X < -24)
             {
                 if (droped) return true;
-                StardewValley.Object obj = new("ofts.jojaExp.item.package.local", 1);
+                /*StardewValley.Object obj = new("ofts.jojaExp.item.package.local", 1);
                 foreach (KeyValuePair<string, int> p in toBeDelivered)
                 {
                     obj.modData.Add(p.Key, p.Value.ToString());
                 }
-                targetLocation.debris.Add(Game1.createItemDebris(obj, target, 0));
+                targetLocation.debris.Add(Game1.createItemDebris(obj, target, 0));*/
                 droped = true;
             }
             return false;
@@ -69,12 +71,13 @@ namespace JojaExpress
             if (tick % 10 == 0) { index++; index %= 3; }
             if (tick == 60)
             {
-                StardewValley.Object obj = new("ofts.jojaExp.item.package.local", 1);
+                /*StardewValley.Object obj = new("ofts.jojaExp.item.package.local", 1);
                 foreach (KeyValuePair<string, int> p in toBeDelivered)
                 {
                     obj.modData.Add(p.Key, p.Value.ToString());
                 }
-                targetLocation.debris.Add(Game1.createItemDebris(obj, target, 0));
+                targetLocation.debris.Add(Game1.createItemDebris(obj, target, 0));*/
+                targetLocation.debris.Add(Game1.createItemDebris(new PackedItem(packageId, toBeDelivered), target, 0));
             }
             if (tick == 120) droped = true;
 

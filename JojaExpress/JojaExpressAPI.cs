@@ -184,27 +184,32 @@ namespace JojaExpress
 
         public void sendLocalPackage(IDictionary<string, int> products, Farmer who)
         {
-            GUI.sendPackage(products);
+            Dictionary<ISalable, ItemStockInformation> tmp = new();
+            foreach (var item in products)
+            {
+                tmp.Add(ItemRegistry.Create(item.Key), new ItemStockInformation(0, item.Value));
+            }
+            GUI.sendPackage(tmp, "_ofts.jojaExp.item.package.local");
         }
 
         public void sendLocalPackage(IDictionary<ISalable, int> products, Farmer who)
         {
-            Dictionary<string, int> tmp = new();
+            Dictionary<ISalable, ItemStockInformation> tmp = new();
             foreach(var item in products)
             {
-                tmp.Add(item.Key.QualifiedItemId, item.Value);
+                tmp.Add(item.Key, new ItemStockInformation(0, item.Value));
             }
-            GUI.sendPackage(tmp);
+            GUI.sendPackage(tmp, "_ofts.jojaExp.item.package.local");
         }
 
         public void sendLocalPackage(IEnumerable<Item> products, Farmer who)
         {
-            Dictionary<string, int> tmp = new();
+            Dictionary<ISalable, ItemStockInformation> tmp = new();
             foreach (var item in products)
             {
-                tmp.Add(item.QualifiedItemId, item.Stack);
+                tmp.Add(item, new ItemStockInformation(0, item.Stack));
             }
-            GUI.sendPackage(tmp);
+            GUI.sendPackage(tmp, "_ofts.jojaExp.item.package.local");
         }
 
         public bool tryBuyGlobalProducts(IDictionary<string, int> products, Farmer who)

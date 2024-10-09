@@ -108,7 +108,7 @@ namespace JojaExpress
                     case "local":
                         {
                             ModEntry.localReceived = new();
-                            GUI.openMenu("ofts.JojaExp.jojaLocal", ModEntry.localReceived, (purchased) => { GUI.sendPackage(purchased); });
+                            GUI.openMenu("ofts.JojaExp.jojaLocal", ModEntry.localReceived, (purchased) => { GUI.sendPackage(purchased, "_ofts.jojaExp.item.package.local"); });
                             break;
                         }
                     case "global":
@@ -273,6 +273,21 @@ namespace JojaExpress
                 return;
             }
             if (!Context.IsWorldReady || Game1.activeClickableMenu != null) return;
+
+            /*
+            if (e.Button.Equals(SButton.N))
+            {
+                Game1.player.addItemToInventory(
+                    new PackedItem(
+                        "ofts.jojaExp.item.package.global", 
+                        new Dictionary<ISalable, ItemStockInformation>()
+                        {
+                            { ItemRegistry.Create("807"), new ItemStockInformation(1, 1)},
+                            { ItemRegistry.Create("805"), new ItemStockInformation(1, 15)},
+                            { ItemRegistry.Create("803"), new ItemStockInformation(1, 115)},
+                        }));;
+            }*/
+
             bool found = false;
             foreach (InputButton key in Game1.options.actionButton)
             {

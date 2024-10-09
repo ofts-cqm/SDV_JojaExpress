@@ -11,7 +11,7 @@ namespace JojaExpress
         public static PerScreen<bool> needToCheckDialogueBox = new(), returnToHelpPage = new();
         public static List<ItemDeliver> delivers = new();
 
-        public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Action<Dictionary<string, int>> actionOnClosed)
+        public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Action<Dictionary<ISalable, ItemStockInformation>> actionOnClosed)
         {
             if (!DataLoader.Shops(Game1.content).TryGetValue(shopId, out var value)) return;
 
@@ -45,6 +45,6 @@ namespace JojaExpress
             }
         }
 
-        public static void sendPackage(IDictionary<string, int> package) => delivers.Add(new(package));
+        public static void sendPackage(IDictionary<ISalable, ItemStockInformation> package, string packageId) => delivers.Add(new(package, packageId));
     }
 }
