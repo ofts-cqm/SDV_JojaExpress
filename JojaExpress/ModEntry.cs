@@ -6,12 +6,13 @@ using Microsoft.Xna.Framework.Graphics;
 using GenericModConfigMenu;
 using StardewValley.Objects;
 using System.Reflection.Metadata;
+using StardewValley.Internal;
 
 namespace JojaExpress
 {
     internal sealed class ModEntry : Mod
     {
-        public static ModConfig? config;
+        public static ModConfig config = new();
         public static List<Dictionary<string, int>> tobeReceived = new() { new()};
         public static Dictionary<long, List<Dictionary<string, int>>> globalReceived = new();
         public static Dictionary<string, int> localReceived = new();
@@ -30,7 +31,7 @@ namespace JojaExpress
             helper.Events.GameLoop.SaveLoaded += load;
             helper.Events.GameLoop.DayStarted += initNewDay;
             helper.Events.GameLoop.DayEnding += PlayerInteractionHandler.sendMail;
-            helper.Events.Content.LocaleChanged += (a, b) => { postfix = Helper.Translation.Get("postfix"); };
+            helper.Events.Content.LocaleChanged += (a, b) => { LoadingManager.updateTranslation(Helper.Translation); };
             helper.Events.GameLoop.Saving += save;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.Player.InventoryChanged += PlayerInteractionHandler.checkInv;
@@ -61,6 +62,7 @@ namespace JojaExpress
                 " - level: amount of items packed. 0 for 25, 1 for 100, 2 for 999.\n" +
                 " - quantity: how many packed items to send", 
                 this.PackItem);
+            ItemQueryResolver.Register("jojaExp.getItem", LoadingManager.handleItemQuery);
         }
 
         public void PackItem(string command, string[] args)
@@ -70,6 +72,7 @@ namespace JojaExpress
                 Monitor.Log("Must be called after a save is loaded", LogLevel.Error);
                 return;
             }
+            //var a = ItemQueryResolver.TryResolve("jojaExp.getItem C-74", new());
             if (args.Length < 2 || args.Length > 3)
             {
                 Monitor.Log("Usage: zip <id> <level> [quantity]\n" +
@@ -264,6 +267,12 @@ namespace JojaExpress
         public bool EnableCommunity { get; set;} = true;
         public bool EnableGlobal { get; set; } = true;
         public bool EnableQi { get; set; } = true;
+        public bool EnableWholeSale { get; set; } = true;
+        public bool EnableJOLN { get; set; } = true;
+        public string[] WholeSaleIds { get; set; } = new[] 
+        {
+            "I388", "I390", "C-74", "I176", "I174", "I180", "I182", "I178", "I442", "C-15", "C-19" 
+        };
     }
 
     public interface ISpaceCoreAPI

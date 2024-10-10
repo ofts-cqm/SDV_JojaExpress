@@ -6,8 +6,10 @@ using StardewValley.BellsAndWhistles;
 using StardewValley.GameData.Shops;
 using StardewValley.Internal;
 using StardewValley.Inventories;
+using StardewValley.Logging;
 using StardewValley.Menus;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace JojaExpress
 {

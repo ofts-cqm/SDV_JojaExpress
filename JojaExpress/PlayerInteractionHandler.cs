@@ -90,6 +90,10 @@ namespace JojaExpress
                 responses.Add(new KeyValuePair<string, string>("global", ModEntry._Helper.Translation.Get("global")));
             if (ModEntry.config.EnableQi)
                 responses.Add(new KeyValuePair<string, string>("qi", ModEntry._Helper.Translation.Get("qi")));
+            if (ModEntry.config.EnableWholeSale)
+                responses.Add(new KeyValuePair<string, string>("whole", ModEntry._Helper.Translation.Get("whole")));
+            if (ModEntry.config.EnableJOLN)
+                responses.Add(new KeyValuePair<string, string>("joln", ModEntry._Helper.Translation.Get("joln")));
             if (responses.Count == 0)
             {
                 Game1.multipleDialogues(ModEntry._Helper.Translation.Get("sorry").ToString().Split('$'));
@@ -122,6 +126,16 @@ namespace JojaExpress
                             {
                                 Game1.activeClickableMenu.exitFunction = exitMenu;
                             }
+                            break;
+                        }
+                    case "whole":
+                        {
+                            GUI.openMenu("ofts.JojaExp.jojaWhole", new(), (purchased) => { GUI.sendPackage(purchased, "_ofts.jojaExp.item.package.whole"); });
+                            break;
+                        }
+                    case "joln":
+                        {
+                            exitMenu();
                             break;
                         }
                     case "help":
@@ -162,6 +176,8 @@ namespace JojaExpress
                 new KeyValuePair<string, string>("local", ModEntry._Helper.Translation.Get("local")),
                 new KeyValuePair<string, string>("global", ModEntry._Helper.Translation.Get("global")),
                 new KeyValuePair<string, string>("qi", ModEntry._Helper.Translation.Get("qi")),
+                new KeyValuePair<string, string>("whole", ModEntry._Helper.Translation.Get("global")),
+                new KeyValuePair<string, string>("joln", ModEntry._Helper.Translation.Get("qi")),
                 new KeyValuePair<string, string>("__cancel", Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel"))
             };
             Game1.currentLocation.ShowPagedResponses(ModEntry._Helper.Translation.Get("app.help"), responses, delegate (string callId)

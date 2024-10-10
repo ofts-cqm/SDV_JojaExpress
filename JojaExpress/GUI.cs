@@ -14,7 +14,6 @@ namespace JojaExpress
         public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Action<Dictionary<ISalable, ItemStockInformation>> actionOnClosed)
         {
             if (!DataLoader.Shops(Game1.content).TryGetValue(shopId, out var value)) return;
-
             ShopOwnerData[] source = ShopBuilder.GetCurrentOwners(value).ToArray();
             ShopOwnerData? ownerData = source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone) ?? source.FirstOrDefault((ShopOwnerData p) => p.Type == ShopOwnerType.AnyOrNone);
 
