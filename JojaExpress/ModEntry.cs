@@ -263,6 +263,7 @@ namespace JojaExpress
         public bool OpenByPhone { get; set; } = true;
         public bool OpenByKey { get; set; } = false;
         public bool OpenByPad { get; set; } = true;
+        public bool OpenByMobilePhone { get; set; } = true;
         public bool CloseWhenCCComplete { get; set; } = true;
         public bool EnableCommunity { get; set;} = true;
         public bool EnableGlobal { get; set; } = true;

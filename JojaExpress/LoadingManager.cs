@@ -32,6 +32,8 @@ namespace JojaExpress
                 tooltip: () => Helper.Translation.Get("open_tip")
             );
 
+            configMenu.AddSectionTitle(ModManifest, () => Helper.Translation.Get("fee_name"));
+
             configMenu.AddNumberOption(
                 mod: ModManifest,
                 getValue: () => config.CarriageFee,
@@ -62,6 +64,8 @@ namespace JojaExpress
                 formatValue: (value) => (value - 1).ToString("P1")
             );
 
+            configMenu.AddSectionTitle(ModManifest, () => Helper.Translation.Get("openMethods"));
+
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 getValue: () => config.OpenByKey,
@@ -85,6 +89,16 @@ namespace JojaExpress
                 name: () => Helper.Translation.Get("openByPhone"),
                 tooltip: () => Helper.Translation.Get("openByPhone_tooltip")
             );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.OpenByMobilePhone,
+                setValue: value => config.OpenByMobilePhone = value,
+                name: () => Helper.Translation.Get("openByMobilePhone"),
+                tooltip: () => Helper.Translation.Get("openByMobilePhone_tooltip")
+            );
+
+            configMenu.AddSectionTitle(ModManifest, () => Helper.Translation.Get("enable_title"));
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
@@ -116,6 +130,40 @@ namespace JojaExpress
                 setValue: value => config.EnableQi = value,
                 name: () => Helper.Translation.Get("enableq"),
                 tooltip: () => Helper.Translation.Get("enableq")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.EnableWholeSale,
+                setValue: value => config.EnableWholeSale = value,
+                name: () => Helper.Translation.Get("enablew"),
+                tooltip: () => Helper.Translation.Get("enablew")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => config.EnableJOLN,
+                setValue: value => config.EnableJOLN = value,
+                name: () => Helper.Translation.Get("enablej"),
+                tooltip: () => Helper.Translation.Get("enablej")
+            );
+
+            configMenu.AddPageLink(
+                mod: ModManifest,
+                pageId: "setWholesale",
+                text: () => Helper.Translation.Get("wholesale_page_title"),
+                tooltip: () => Helper.Translation.Get("wholesale_page_tooltip")
+            );
+
+            configMenu.AddPage(ModManifest, "setWholesale");
+
+            configMenu.AddComplexOption(
+                mod: ModManifest,
+                name: () => Helper.Translation.Get("wholesale_page_title"),
+                draw: GUI.drawConfigMenu,
+                beforeMenuOpened: GUI.prepareConfigMenu,
+                beforeSave: GUI.saveConfigMenu,
+                beforeReset: GUI.resetConfigMenu
             );
         }
 

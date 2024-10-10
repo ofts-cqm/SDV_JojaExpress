@@ -9,7 +9,7 @@ namespace JojaExpress
 {
     public class PlayerInteractionHandler
     {
-        public static IMobilePhoneApi Api;
+        public static IMobilePhoneApi? Api;
         public static PerScreen<bool> isAppRunning = new(), isJPadRunning = new();
 
         public static void checkInv(object? sender, InventoryChangedEventArgs args)
@@ -31,7 +31,7 @@ namespace JojaExpress
         public static void handlePhone()
         {
             if (isJPadRunning.Value) { }
-            else if (!(Api == null || Api.IsCallingNPC() || Api.GetAppRunning()))
+            else if (!(Api == null || Api.IsCallingNPC() || Api.GetAppRunning()) && ModEntry.config.OpenByPhone)
             {
                 Api.SetAppRunning(true);
                 Api.SetRunningApp("Joja Express");
@@ -176,8 +176,8 @@ namespace JojaExpress
                 new KeyValuePair<string, string>("local", ModEntry._Helper.Translation.Get("local")),
                 new KeyValuePair<string, string>("global", ModEntry._Helper.Translation.Get("global")),
                 new KeyValuePair<string, string>("qi", ModEntry._Helper.Translation.Get("qi")),
-                new KeyValuePair<string, string>("whole", ModEntry._Helper.Translation.Get("global")),
-                new KeyValuePair<string, string>("joln", ModEntry._Helper.Translation.Get("qi")),
+                new KeyValuePair<string, string>("whole", ModEntry._Helper.Translation.Get("whole")),
+                new KeyValuePair<string, string>("joln", ModEntry._Helper.Translation.Get("joln")),
                 new KeyValuePair<string, string>("__cancel", Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel"))
             };
             Game1.currentLocation.ShowPagedResponses(ModEntry._Helper.Translation.Get("app.help"), responses, delegate (string callId)
@@ -223,7 +223,7 @@ namespace JojaExpress
         {
             if(isAppRunning.Value)
             {
-                Api.SetAppRunning(false);
+                Api?.SetAppRunning(false);
                 isAppRunning.Value = false;
             }
             else if (isJPadRunning.Value)
@@ -289,20 +289,6 @@ namespace JojaExpress
                 return;
             }
             if (!Context.IsWorldReady || Game1.activeClickableMenu != null) return;
-
-            /*
-            if (e.Button.Equals(SButton.N))
-            {
-                Game1.player.addItemToInventory(
-                    new PackedItem(
-                        "ofts.jojaExp.item.package.global", 
-                        new Dictionary<ISalable, ItemStockInformation>()
-                        {
-                            { ItemRegistry.Create("807"), new ItemStockInformation(1, 1)},
-                            { ItemRegistry.Create("805"), new ItemStockInformation(1, 15)},
-                            { ItemRegistry.Create("803"), new ItemStockInformation(1, 115)},
-                        }));;
-            }*/
 
             bool found = false;
             foreach (InputButton key in Game1.options.actionButton)

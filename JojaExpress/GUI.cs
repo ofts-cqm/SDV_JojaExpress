@@ -3,6 +3,9 @@ using StardewValley.GameData.Shops;
 using StardewValley.Internal;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using StardewValley.Menus;
 
 namespace JojaExpress
 {
@@ -10,6 +13,7 @@ namespace JojaExpress
     {
         public static PerScreen<bool> needToCheckDialogueBox = new(), returnToHelpPage = new();
         public static List<ItemDeliver> delivers = new();
+        public static PerScreen<List<ClickableTextureComponent>> dataList = new();
 
         public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Action<Dictionary<ISalable, ItemStockInformation>> actionOnClosed)
         {
@@ -19,6 +23,33 @@ namespace JojaExpress
 
             CustomizedShop menu = new(shopId, value, knownPurchased, actionOnClosed);
             Game1.activeClickableMenu = menu;
+        }
+
+        public static void prepareConfigMenu()
+        {
+            foreach(string str in ModEntry.config.WholeSaleIds)
+            {
+                //dataList.Value.Add(new());
+            }
+        }
+
+        public static void saveConfigMenu()
+        {
+
+        }
+
+        public static void resetConfigMenu()
+        {
+            ModEntry.config.WholeSaleIds = new[]
+            {
+                "I388", "I390", "C-74", "I176", "I174", "I180", "I182", "I178", "I442", "C-15", "C-19"
+            };
+            prepareConfigMenu();
+        }
+
+        public static void drawConfigMenu(SpriteBatch b, Vector2 position)
+        {
+
         }
 
         public static void drawBird(object? sender, RenderedWorldEventArgs e)
