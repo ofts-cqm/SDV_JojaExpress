@@ -135,7 +135,7 @@ namespace JojaExpress
                         }
                     case "joln":
                         {
-                            exitMenu();
+                            GUI.openMenu("ofts.JojaExp.joln", new(), (purchased) => { GUI.sendPackage(purchased, "_ofts.jojaExp.item.package.joln"); });
                             break;
                         }
                     case "help":

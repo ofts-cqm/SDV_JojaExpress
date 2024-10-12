@@ -5,7 +5,7 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using StardewValley.Menus;
+using StardewValley.ItemTypeDefinitions;
 
 namespace JojaExpress
 {
@@ -13,7 +13,12 @@ namespace JojaExpress
     {
         public static PerScreen<bool> needToCheckDialogueBox = new(), returnToHelpPage = new();
         public static List<ItemDeliver> delivers = new();
-        public static PerScreen<List<ClickableTextureComponent>> dataList = new();
+        public static PerScreen<List<string>> nameList = new();
+        public static PerScreen<List<Texture2D>> itemList = new();
+        public static PerScreen<List<Rectangle>> sourceRects = new();
+        public static Texture2D? defaultTexture;
+        public static Rectangle defaultRect = new(257, 184, 16, 16);
+        public static PerScreen<int> loadAmount = new();
 
         public static void openMenu(string shopId, Dictionary<string, int> knownPurchased, Action<Dictionary<ISalable, ItemStockInformation>> actionOnClosed)
         {
@@ -27,9 +32,27 @@ namespace JojaExpress
 
         public static void prepareConfigMenu()
         {
+            nameList.Value = new();
+            itemList.Value = new();
+            sourceRects.Value = new();
+            loadAmount.Value = ModEntry.config.WholeSaleIds.Length;
+            if (defaultTexture is null) defaultTexture = Game1.content.Load<Texture2D>("LooseSprites\\temporary_sprites_1");
+
             foreach(string str in ModEntry.config.WholeSaleIds)
             {
-                //dataList.Value.Add(new());
+                if (str[0] == 'I')
+                {
+                    ParsedItemData data = ItemRegistry.GetDataOrErrorItem(str[1..]);
+                    nameList.Value.Add(data.DisplayName);
+                    itemList.Value.Add(data.GetTexture());
+                    sourceRects.Value.Add(data.GetSourceRect());
+                }
+                else
+                {
+                    nameList.Value.Add("Category: " + str[1..]);
+                    itemList.Value.Add(defaultTexture);
+                    sourceRects.Value.Add(defaultRect);
+                }
             }
         }
 
@@ -49,7 +72,11 @@ namespace JojaExpress
 
         public static void drawConfigMenu(SpriteBatch b, Vector2 position)
         {
-
+            for(int i = 0; i < loadAmount.Value; i++)
+            {
+                b.Draw(itemList.Value[i], position + new Vector2(0, 20 + i * 80), sourceRects.Value[i], Color.White, 0f, new Vector2(8, 8), 4f, SpriteEffects.None, 0.88f);
+                b.DrawString(Game1.dialogueFont, nameList.Value[i], position + new Vector2(100, i * 80), Color.Brown);
+            }
         }
 
         public static void drawBird(object? sender, RenderedWorldEventArgs e)

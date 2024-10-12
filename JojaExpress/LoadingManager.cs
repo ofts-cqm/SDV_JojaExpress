@@ -163,7 +163,8 @@ namespace JojaExpress
                 draw: GUI.drawConfigMenu,
                 beforeMenuOpened: GUI.prepareConfigMenu,
                 beforeSave: GUI.saveConfigMenu,
-                beforeReset: GUI.resetConfigMenu
+                beforeReset: GUI.resetConfigMenu,
+                height: () => GUI.loadAmount.Value * 80 + 200
             );
         }
 
@@ -183,6 +184,15 @@ namespace JojaExpress
                 new(new PackedItem("_" + id, 1, 1)),
                 new(new PackedItem("_" + id, 1, 2))
             };
+        }
+
+        public static string resolveRecipe(string loadedRecipe)
+        {
+            string[] recipe = loadedRecipe.Split('/');
+            string item = recipe[2].Split(' ')[0];
+            string id = bool.TryParse(recipe[3], out var isBC) && isBC ? "(BC)" + item : "(O)" + item;
+            ItemRegistry.GetMetadata(id).GetParsedData();
+            return id;
         }
 
         public static IEnumerable<ItemQueryResult> handleItemQuery(string key, string arguments, ItemQueryContext _, bool __, HashSet<string> avoidItemIds, Action<string, string> logError)
@@ -228,6 +238,7 @@ namespace JojaExpress
                         { "descrip_global", ModEntry._Helper.Translation.Get("item.package.descrip.global") },
                         { "descrip_local", ModEntry._Helper.Translation.Get("item.package.descrip.local") },
                         { "descrip_whole", ModEntry._Helper.Translation.Get("item.package.descrip.whole") },
+                        { "descrip_joln", ModEntry._Helper.Translation.Get("item.package.descrip.joln") },
                         { "descrip_jpad", ModEntry._Helper.Translation.Get("item.jpad.descrip") },
                         { "jpad", ModEntry._Helper.Translation.Get("item.jpad") }
                     };
@@ -269,6 +280,32 @@ namespace JojaExpress
                         wholesale.Items.Add(new() {ItemId = "jojaExp.getItem " + id, Id = "ofts.jojaExp.sid." + id });
                     }
                     data.Add("ofts.JojaExp.jojaWhole", wholesale);
+
+                    // joln
+                    ShopData joln = initShop();
+                    joln.PriceModifierMode = QuantityModifier.QuantityModifierMode.Stack;
+                    joln.PriceModifiers = new() {
+                        new() { Amount = 10f, Modification = QuantityModifier.ModificationType.Multiply, Id = "jojaExp.joln.1", Condition = "TRUE"},
+                        new() { Amount = 500f, Modification = QuantityModifier.ModificationType.Add, Id = "jojaExp.joln.2", Condition = "TRUE"}
+                    };
+                    foreach (string keys in CraftingRecipe.craftingRecipes.Values)
+                    {
+                        string key = resolveRecipe(keys);
+                        joln.Items.Add(new() { ItemId = key, Id = "ofts.jojaExp.sid.craft." + key, IsRecipe = true});
+                    }
+                    foreach (string keys in CraftingRecipe.cookingRecipes.Values)
+                    {
+                        string key = resolveRecipe(keys);
+                        joln.Items.Add(new() { ItemId = key, Id = "ofts.jojaExp.sid.cook." + key, IsRecipe = true });
+                    }
+                    foreach (KeyValuePair<string, ObjectData> pair in Game1.objectData)
+                    {
+                        if (pair.Value.Category == -102 || pair.Value.Category == -103)
+                        {
+                            joln.Items.Add(new() { ItemId = "(O)" + pair.Key, Id = pair.Key});
+                        }
+                    }
+                    data.Add("ofts.JojaExp.joln", joln);
 
                     // joja mart
                     data["Joja"].Items.Add(new ShopItemData() { 
@@ -343,6 +380,22 @@ namespace JojaExpress
                         ExcludeFromShippingCollection = true
                     };
                     objects.Add("ofts.jojaExp.item.package.whole", data3);
+                    ObjectData data4 = new()
+                    {
+                        Name = "jojaExp.jolnPackage",
+                        DisplayName = "[LocalizedText JojaExp\\string:display]",
+                        Description = "[LocalizedText JojaExp\\string:descrip_joln]",
+                        Type = "Basic",
+                        Category = -999,
+                        Price = 0,
+                        Texture = "LooseSprites/Giftbox",
+                        SpriteIndex = 55,
+                        IsDrink = false,
+                        ExcludeFromFishingCollection = true,
+                        ExcludeFromRandomSale = true,
+                        ExcludeFromShippingCollection = true
+                    };
+                    objects.Add("ofts.jojaExp.item.package.joln", data4);
                 });
             }
             else if (e.NameWithoutLocale.IsEquivalentTo("JojaExp/assets/JPad"))

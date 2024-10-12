@@ -209,7 +209,7 @@ namespace JojaExpress
                             bool discard = item.actionWhenPurchased(shopId);
                             if (item.IsRecipe)
                             {
-                                string key = item.Name;
+                                string key = item.Name.Substring(0, item.Name.IndexOf("Recipe") - 1);
                                 if (item is Item obj && obj.Category == -7)
                                 {
                                     Game1.player.cookingRecipes.Add(key, 0);
