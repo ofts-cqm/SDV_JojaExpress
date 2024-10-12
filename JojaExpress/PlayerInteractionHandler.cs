@@ -41,15 +41,15 @@ namespace JojaExpress
             
             MobilePhoneRender.setBG("question");
             MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 30, 60, 250, 120, Game1.dialogueFont));
-            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
-            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 35, 255, 210, 60, null, true));
-            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 35, 306, 210, 60, null, true));
-            MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 35, 363, 210, 60, null, true));
+            //MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
+            //MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 35, 255, 210, 60, null, true));
+            //MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 35, 306, 210, 60, null, true));
+            //MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 35, 363, 210, 60, null, true));
             MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.welcome"), 55, 35, 150, 190, Game1.dialogueFont));
-            MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 230, 50, 210, 60, null, true));
-            MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 230, 101, 210, 60, null, true));
-            MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 230, 152, 210, 60, null, true));
-            MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 230, 203, 210, 60, null, true));
+            //MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 230, 50, 210, 60, null, true));
+            //MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 230, 101, 210, 60, null, true));
+            //MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 230, 152, 210, 60, null, true));
+            //MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("help"), 230, 203, 210, 60, null, true));
             openMenu();
         }
 
@@ -160,15 +160,15 @@ namespace JojaExpress
                 MobilePhoneRender.landscape.Clear();
                 MobilePhoneRender.setBG("question");
                 MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.help"), 30, 60, 250, 120, Game1.dialogueFont));
-                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
-                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 35, 255, 210, 60, null, true));
-                MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 35, 306, 210, 60, null, true));
-                MobilePhoneRender.protrait.Add(new RenderPack(Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel"), 35, 363, 210, 60, null, true));
+                //MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 35, 203, 210, 60, null, true));
+                //MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 35, 255, 210, 60, null, true));
+                //MobilePhoneRender.protrait.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 35, 306, 210, 60, null, true));
+                //MobilePhoneRender.protrait.Add(new RenderPack(Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel"), 35, 363, 210, 60, null, true));
                 MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("app.help"), 55, 35, 150, 190, Game1.dialogueFont));
-                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 230, 50, 210, 60, null, true));
-                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 230, 101, 210, 60, null, true));
-                MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 230, 152, 210, 60, null, true));
-                MobilePhoneRender.landscape.Add(new RenderPack(Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel"), 230, 203, 210, 60, null, true));
+                //MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("local"), 230, 50, 210, 60, null, true));
+                //MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("global"), 230, 101, 210, 60, null, true));
+                //MobilePhoneRender.landscape.Add(new RenderPack(ModEntry._Helper.Translation.Get("qi"), 230, 152, 210, 60, null, true));
+                //MobilePhoneRender.landscape.Add(new RenderPack(Game1.content.LoadString("Strings\\Locations:MineCart_Destination_Cancel"), 230, 203, 210, 60, null, true));
             }
 
             List<KeyValuePair<string, string>> responses = new()
