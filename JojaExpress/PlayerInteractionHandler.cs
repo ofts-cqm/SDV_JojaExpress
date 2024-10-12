@@ -135,7 +135,7 @@ namespace JojaExpress
                         }
                     case "joln":
                         {
-                            GUI.openMenu("ofts.JojaExp.joln", new(), (purchased) => { GUI.sendPackage(purchased, "_ofts.jojaExp.item.package.joln"); });
+                            GUI.openMenu("ofts.JojaExp.joln", new(), (purchased) => { Game1.activeClickableMenu = new JOLNMenu(purchased); });
                             break;
                         }
                     case "help":

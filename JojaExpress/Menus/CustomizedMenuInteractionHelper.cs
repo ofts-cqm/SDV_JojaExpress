@@ -54,6 +54,7 @@ namespace JojaExpress
                 viewingCart = true;
                 currentItemIndex = 0;
                 currentList = new View(purchased);
+                _setScrollBarToCurrentIndex();
                 searchBox.Text = "";
                 return;
             }
@@ -62,6 +63,7 @@ namespace JojaExpress
                 viewingCart = false;
                 currentItemIndex = 0;
                 currentList = new View(forSale);
+                _setScrollBarToCurrentIndex();
                 searchBox.Text = "";
                 return;
             }

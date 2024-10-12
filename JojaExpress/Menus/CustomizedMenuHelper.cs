@@ -231,6 +231,7 @@ namespace JojaExpress
                             viewingCart = false;
                             currentItemIndex = 0;
                             currentList = new View(forSale);
+                            _setScrollBarToCurrentIndex();
                             searchBox.Text = "";
                             viewingNotification = false;
                             break;

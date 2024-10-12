@@ -228,8 +228,8 @@ namespace JojaExpress
 
                             Game1.currentLocation.debris.Add(Game1.createItemDebris(item, Game1.player.Position, 0));
                         }
-                        if (cookingLearned) Game1.addHUDMessage(new HUDMessage(ModEntry._Helper.Translation.Get("newCooking")));
-                        if (craftingLearned) Game1.addHUDMessage(new HUDMessage(ModEntry._Helper.Translation.Get("newCrafting")));
+                        if (cookingLearned) Game1.addHUDMessage(new HUDMessage(ModEntry._Helper.Translation.Get("newCooking"), HUDMessage.achievement_type));
+                        if (craftingLearned) Game1.addHUDMessage(new HUDMessage(ModEntry._Helper.Translation.Get("newCrafting"), HUDMessage.achievement_type));
 
                         break;
                     }
