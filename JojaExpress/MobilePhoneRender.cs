@@ -89,7 +89,7 @@ namespace JojaExpress
             return strs;
         }
 
-        public static void drawStr(SpriteBatch b, string str, Rectangle rec, SpriteFont font, bool middle)
+        public static void drawStr(SpriteBatch b, string str, Rectangle rec, SpriteFont font, bool middle, uint color = uint.MaxValue)
         {
             // 画string的一个helper function。可以换行。返回最后一个字符的坐标
             int ypos = rec.Y;
@@ -113,7 +113,7 @@ namespace JojaExpress
                 // 如果X超了，换行
                 if (measured.X > rec.Width)
                 {
-                    b.DrawString(font, currentStr, position, Color.White);
+                    b.DrawString(font, currentStr, position, new(color));
                     ypos += (int)measured.Y;
                     currentStr = "";
                 }
@@ -127,7 +127,7 @@ namespace JojaExpress
             // 如果Y超了，罢工不画了
             if (measured2.Y + ypos <= rec.Y + rec.Height && measured2.X <= rec.Width)
             {
-                b.DrawString(font, currentStr, position2, Color.White);
+                b.DrawString(font, currentStr, position2, new(color));
             }
         }
     }

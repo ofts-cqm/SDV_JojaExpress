@@ -19,7 +19,7 @@ namespace JojaExpress
 
         public static void prepareConfigMenu() => menus.Value = new();
 
-        public static void saveConfigMenu() => ModEntry.config.WholeSaleIds = menus.Value.rawIDs.ToArray();
+        public static void saveConfigMenu() { if (menus.Value != null) ModEntry.config.WholeSaleIds = menus.Value.rawIDs.ToArray(); }
 
         public static void closeConfigMenu() => menus.Value = null;
 

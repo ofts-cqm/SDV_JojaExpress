@@ -230,6 +230,8 @@ namespace JojaExpress
             ConfigMenu.categoryTranslation = helper.Get("configMenu.category");
             ConfigMenu.addItemTranslation = helper.Get("configMenu.addItem");
             ConfigMenu.addCategoryTranslation = helper.Get("configMenu.addCategory");
+            ConfigMenu.categoryDictionary.Clear();
+            ConfigMenu.addCategoryDictionary();
         }
         public static void loadAsset(object? sender, AssetRequestedEventArgs e)
         {

@@ -143,6 +143,8 @@ namespace JojaExpress
             {
                 spaceCore.RegisterSerializerType(typeof(PackedItem));
             }
+
+            LoadingManager.updateTranslation(Helper.Translation);
         }
 
         public void receiveMultiplayerMessage(object? sender, ModMessageReceivedEventArgs e)

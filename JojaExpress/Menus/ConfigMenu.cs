@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
-using System.Collections.Generic;
 using Object = StardewValley.Object;
 
 namespace JojaExpress
@@ -36,7 +35,7 @@ namespace JojaExpress
             for (int i = 0; i < loadAmount; i++)
             {
                 string id = ids[i], itemId = id[1..];
-                rawIDs.Add(itemId);
+                rawIDs.Add(id);
                 if (id[0] == 'C')
                 {
                     displayNames.Add(categoryTranslation + Object.GetCategoryDisplayName(int.Parse(itemId)));
@@ -50,7 +49,7 @@ namespace JojaExpress
                 }
                 deleteIcons.Add(new(new(0, 0, 64, 64), Game1.mouseCursors, new(268, 470, 16, 16), 4f));
             }
-            textbox = new(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont, Color.Brown) { Selected = false };
+            textbox = new(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont, Color.Brown) { Selected = false, Height = 48, Width = 192 };
             option = new(new(0, 0, 256, 56), menuTexture, new(96, 0, 130, 26), 2f);
             modify = new(new(0, 0, 64, 64), Game1.mouseCursors, new(128, 256, 64, 64), 0.75f);
             cancel = new(new(0, 0, 64, 64), Game1.mouseCursors, new(192, 256, 64, 64), 0.75f);
@@ -58,10 +57,12 @@ namespace JojaExpress
             textbox.OnEnterPressed += checkInputText;
             textbox.OnTabPressed += (_) => addItem = !addItem;
 
-            if (categoryDictionary.Count == 0) for (int i = 0; i > -104; i--) categoryDictionary.Add(Object.GetCategoryDisplayName(i), i);
+            if (categoryDictionary.Count == 0) for (int i = 0; i > -104; i--) categoryDictionary.TryAdd(Object.GetCategoryDisplayName(i), i);
         }
 
         public override bool readyToClose() => false;
+
+        public static void addCategoryDictionary() { for (int i = 0; i > -104; i--) categoryDictionary.TryAdd(Object.GetCategoryDisplayName(i), i); }
 
         public void checkInputText(TextBox? _ = null)
         {
@@ -173,28 +174,36 @@ namespace JojaExpress
                 if (new Rectangle(xPositionOnScreen, yPositionOnScreen + i * 80, 416, 80).Contains(x, y) && selectedIndex != i)
                 {
                     selectedIndex = i;
-                    textbox.Text = rawIDs[i];
+                    textbox.Text = rawIDs[i][1..];
                     return;
                 }
             }
-            if (textbox.X < x && textbox.Y < y && textbox.X + width > x && textbox.Y + height > y)
+            if (textbox.X < x && textbox.Y < y && textbox.X + textbox.Width > x && textbox.Y + textbox.Height > y)
             {
                 if (!textbox.Selected)
                 {
                     textbox.SelectMe();
-                    noteString = ModEntry._Helper.Translation.Get("configMenu.note" + (addItem ? "Object" : "Category"));
+                    noteString = ModEntry._Helper.Translation.Get("configMenu.note" + (addItem ? "Item" : "Category"));
                 }
                 return;
             }
-            else
+            else if (!option.containsPoint(x, y))
             {
                 textbox.Selected = false;
                 noteString = "";
             }
 
-            if (cancel.containsPoint(x, y)) textbox.Text = "";
+            if (cancel.containsPoint(x, y)) 
+            {
+                textbox.Text = "";
+                selectedIndex = -1;
+            }
             if (modify.containsPoint(x, y)) checkInputText();
-            if (option.containsPoint(x, y)) addItem = !addItem;
+            if (option.containsPoint(x, y)) 
+            {
+                addItem = !addItem;
+                noteString = ModEntry._Helper.Translation.Get("configMenu.note" + (addItem ? "Item" : "Category"));
+            }
         }
 
         public override void performHoverAction(int x, int y)
@@ -210,12 +219,19 @@ namespace JojaExpress
             cancel.tryHover(x, y);
         }
 
+        public Color getColor(int i)
+        {
+            if (i == selectedIndex) return Color.LightYellow;
+            if (i == hoveredIndex) return Color.Wheat;
+            return Color.White;
+        }
+
         public override void draw(SpriteBatch b)
         {
             drawTextureBox(b, Game1.mouseCursors, rowBackgroundSource, xPositionOnScreen - 16, yPositionOnScreen - 16, 448, loadAmount * 80 + 32, Color.White, 4f, false);
             for (int i = 0; i < loadAmount; i++)
             {
-                drawTextureBox(b, Game1.mouseCursors, itemBackgroundSource, xPositionOnScreen, yPositionOnScreen + i * 80, 416, 80, hoveredIndex == i ? Color.Wheat : Color.White, 2f, false);
+                drawTextureBox(b, Game1.mouseCursors, itemBackgroundSource, xPositionOnScreen, yPositionOnScreen + i * 80, 416, 80, getColor(i), 2f, false);
                 itemIcons[i].bounds.X = xPositionOnScreen + 8;
                 itemIcons[i].bounds.Y = yPositionOnScreen + i * 80 + 8;
                 itemIcons[i].draw(b);
@@ -238,6 +254,8 @@ namespace JojaExpress
             cancel.bounds.X = xPositionOnScreen + 240;
             cancel.bounds.Y = yPositionOnScreen + loadAmount * 80 + 100;
             cancel.draw(b);
+            MobilePhoneRender.drawStr(b, noteString, new(xPositionOnScreen - 16, yPositionOnScreen + loadAmount * 80 + 150, 500, 500), Game1.smallFont, false, 4278190335u);
+            //SpriteText.drawString(b, noteString, xPositionOnScreen - 16, yPositionOnScreen + loadAmount * 80 + 150, width: 500, color: Color.Red);
         }
     }
 }
