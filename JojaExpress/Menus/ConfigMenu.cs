@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
+using System.Collections.Generic;
 using Object = StardewValley.Object;
 
 namespace JojaExpress
@@ -15,12 +16,14 @@ namespace JojaExpress
         public List<string> displayNames = new();
         public List<string> rawIDs = new();
         public Texture2D defaultTexture, menuTexture;
+        public string noteString = "";
         public TextBox textbox;
         public ClickableTextureComponent option, modify, cancel;
         public bool addItem = true;
         public static readonly Rectangle defaultSource = new(257, 184, 16, 16),
             itemBackgroundSource = new(384, 396, 15, 15),
             rowBackgroundSource = new(384, 373, 18, 18);
+        public static Dictionary<string, int> categoryDictionary = new();
 
         public ConfigMenu() 
         {
@@ -51,6 +54,147 @@ namespace JojaExpress
             option = new(new(0, 0, 256, 56), menuTexture, new(96, 0, 130, 26), 2f);
             modify = new(new(0, 0, 64, 64), Game1.mouseCursors, new(128, 256, 64, 64), 0.75f);
             cancel = new(new(0, 0, 64, 64), Game1.mouseCursors, new(192, 256, 64, 64), 0.75f);
+
+            textbox.OnEnterPressed += checkInputText;
+            textbox.OnTabPressed += (_) => addItem = !addItem;
+
+            if (categoryDictionary.Count == 0) for (int i = 0; i > -104; i--) categoryDictionary.Add(Object.GetCategoryDisplayName(i), i);
+        }
+
+        public override bool readyToClose() => false;
+
+        public void checkInputText(TextBox? _ = null)
+        {
+            textbox.Selected = false;
+            string id = textbox.Text;
+            if (addItem)
+            {
+                ParsedItemData data;
+                if (Game1.objectData.ContainsKey(id))
+                {
+                    data = ItemRegistry.GetData("(O)" + id);
+                }
+                else
+                {
+                    IItemDataDefinition itemType = ItemRegistry.GetObjectTypeDefinition();
+                    foreach (string allId in itemType.GetAllIds())
+                    {
+                        ParsedItemData tempData = itemType.GetData(allId);
+                        if (tempData.InternalName == id || tempData.DisplayName == id)
+                        {
+                            data = tempData;
+                            goto modifyItem;
+                        }
+                    }
+                    noteString = ModEntry._Helper.Translation.Get("configMenu.error", new { type = "Object", source = id});
+                    return;
+                }
+
+                modifyItem:
+                if (selectedIndex == -1)
+                {
+                    rawIDs.Add('I' + data.ItemId);
+                    displayNames.Add(data.DisplayName);
+                    itemIcons.Add(new(new(8, loadAmount * 80 + 8, 64, 64), data.GetTexture(), data.GetSourceRect(), 4f));
+                    deleteIcons.Add(new(new(0, 0, 64, 64), Game1.mouseCursors, new(268, 470, 16, 16), 4f));
+                    loadAmount++;
+                }
+                else
+                {
+                    rawIDs[selectedIndex] = 'I' + data.ItemId;
+                    displayNames[selectedIndex] = data.DisplayName;
+                    itemIcons[selectedIndex].texture = data.GetTexture();
+                    itemIcons[selectedIndex].sourceRect = data.GetSourceRect();
+                }
+
+                noteString = ModEntry._Helper.Translation.Get("configMenu.success", new { type = "item", source = data.DisplayName });
+            }
+            else
+            {
+                int categoryId;
+                string categoryName;
+                if (int.TryParse(id, out categoryId))
+                {
+                    categoryName = Object.GetCategoryDisplayName(categoryId);
+                    if(categoryName == "")
+                    {
+                        noteString = ModEntry._Helper.Translation.Get("configMenu.error", new { type = "Category", source = id });
+                        return;
+                    }
+                }
+                else
+                {
+                    categoryName = id;
+                    if (!categoryDictionary.TryGetValue(id, out categoryId))
+                    {
+                        noteString = ModEntry._Helper.Translation.Get("configMenu.error", new { type = "Category", source = id });
+                        return;
+                    }
+                }
+
+                if (selectedIndex == -1)
+                {
+                    rawIDs.Add("C" + categoryId);
+                    displayNames.Add(categoryTranslation + categoryName);
+                    itemIcons.Add(new(new(8, loadAmount * 80 + 8, 64, 64), defaultTexture, defaultSource, 4f));
+                    deleteIcons.Add(new(new(0, 0, 64, 64), Game1.mouseCursors, new(268, 470, 16, 16), 4f));
+                    loadAmount++;
+                }
+                else
+                {
+                    rawIDs[selectedIndex] = "C" + categoryId;
+                    displayNames[selectedIndex] = categoryName;
+                    itemIcons[selectedIndex].texture = defaultTexture;
+                    itemIcons[selectedIndex].sourceRect = defaultSource;
+                }
+                noteString = ModEntry._Helper.Translation.Get("configMenu.success", new { type = "Category", source = categoryName });
+            }
+        }
+
+        public override void receiveLeftClick(int x, int y, bool playSound = true)
+        {
+            for (int i = 0; i < loadAmount; i++)
+            {
+                if (deleteIcons[i].containsPoint(x, y))
+                {
+                    loadAmount--;
+                    deleteIcons.RemoveAt(i);
+                    itemIcons.RemoveAt(i);
+                    displayNames.RemoveAt(i);
+                    rawIDs.RemoveAt(i);
+                    if(selectedIndex == i)
+                    {
+                        selectedIndex = -1;
+                        textbox.Text = "";
+                        textbox.Selected = false;
+                    }
+                    return;
+                }
+                if (new Rectangle(xPositionOnScreen, yPositionOnScreen + i * 80, 416, 80).Contains(x, y) && selectedIndex != i)
+                {
+                    selectedIndex = i;
+                    textbox.Text = rawIDs[i];
+                    return;
+                }
+            }
+            if (textbox.X < x && textbox.Y < y && textbox.X + width > x && textbox.Y + height > y)
+            {
+                if (!textbox.Selected)
+                {
+                    textbox.SelectMe();
+                    noteString = ModEntry._Helper.Translation.Get("configMenu.note" + (addItem ? "Object" : "Category"));
+                }
+                return;
+            }
+            else
+            {
+                textbox.Selected = false;
+                noteString = "";
+            }
+
+            if (cancel.containsPoint(x, y)) textbox.Text = "";
+            if (modify.containsPoint(x, y)) checkInputText();
+            if (option.containsPoint(x, y)) addItem = !addItem;
         }
 
         public override void performHoverAction(int x, int y)
