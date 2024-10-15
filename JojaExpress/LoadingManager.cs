@@ -164,7 +164,8 @@ namespace JojaExpress
                 beforeMenuOpened: GUI.prepareConfigMenu,
                 beforeSave: GUI.saveConfigMenu,
                 beforeReset: GUI.resetConfigMenu,
-                height: () => GUI.loadAmount.Value * 80 + 200
+                beforeMenuClosed: GUI.closeConfigMenu,
+                height: () => GUI.loadAmount() * 80 + 200
             );
         }
 
@@ -225,6 +226,10 @@ namespace JojaExpress
         {
             PackedItemDefinition.packedDescription = helper.Get("item.package.descrip.packed");
             PackedItemDefinition.packedName = helper.Get("item.package.packed");
+            ConfigMenu.addTranslation = helper.Get("configMenu.add");
+            ConfigMenu.categoryTranslation = helper.Get("configMenu.category");
+            ConfigMenu.addItemTranslation = helper.Get("configMenu.addItem");
+            ConfigMenu.addCategoryTranslation = helper.Get("configMenu.addCategory");
         }
         public static void loadAsset(object? sender, AssetRequestedEventArgs e)
         {

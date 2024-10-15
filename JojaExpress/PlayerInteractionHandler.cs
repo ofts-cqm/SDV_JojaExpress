@@ -281,6 +281,11 @@ namespace JojaExpress
 
         public static void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
+            if (e.Button.Equals(SButton.MouseLeft) || e.Button.Equals(SButton.ControllerX))
+            {
+                GUI.menus.Value?.receiveLeftClick(Game1.getMouseX(), Game1.getMouseY());
+            }
+
             if (ModEntry.config != null && ModEntry.config.Open.JustPressed() && ModEntry.config.OpenByKey && 
                 DataLoader.Shops(Game1.content).ContainsKey("ofts.JojaExp.jojaLocal") && 
                 Context.IsWorldReady && Game1.activeClickableMenu == null)
