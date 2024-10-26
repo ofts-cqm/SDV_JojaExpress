@@ -15,7 +15,7 @@ namespace JojaExpress
         public static ModConfig config = new();
         public static List<Dictionary<string, int>> tobeReceived = new() { new()};
         public static Dictionary<long, List<Dictionary<string, int>>> globalReceived = new();
-        public static Dictionary<string, int> localReceived = new();
+        public static Dictionary<string, int> localReceived { get; set; } = new();
         public static bool needMail { get;set;  } = false;
         public static int fee_state = 0;
         public static Translation postfix;

@@ -117,7 +117,18 @@ namespace JojaExpress
                         }
                     case "global":
                         {
-                            GUI.openMenu("ofts.JojaExp.jojaGlobal", ModEntry.tobeReceived.Last(), (purchased) => { ModEntry.needMail = true; });
+                            GUI.openMenu("ofts.JojaExp.jojaGlobal", ModEntry.tobeReceived.Last(), (purchased) => 
+                            {
+                                ModEntry.needMail = true;
+                                foreach (var p in purchased)
+                                {
+                                    if (ModEntry.tobeReceived.Last().ContainsKey(p.Key.QualifiedItemId))
+                                    {
+                                        ModEntry.tobeReceived.Last()[p.Key.QualifiedItemId] += p.Value.Stock;
+                                    }
+                                    else ModEntry.tobeReceived.Last().Add(p.Key.QualifiedItemId, p.Value.Stock);
+                                }
+                            });
                             break;
                         }
                     case "qi":
