@@ -5,7 +5,6 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.ItemTypeDefinitions;
-using StardewValley.Logging;
 using StardewValley.Menus;
 using StardewValley.Triggers;
 using System;
@@ -340,7 +339,7 @@ namespace JojaExpress
                 }
             }
 
-            onPurchase(item, Game1.player, stockToBuy);
+            onPurchase(item, Game1.player, stockToBuy, itemPriceAndStock[item]);
 
             if (itemPriceAndStock[item].Stock <= 0)
             {

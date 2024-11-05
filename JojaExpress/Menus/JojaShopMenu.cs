@@ -112,7 +112,7 @@ namespace JojaExpress
             PlayerInteractionHandler.exitMenu();
         }
 
-        public bool onPurchaseFunc(ISalable item, Farmer farmer, int amt)
+        public bool onPurchaseFunc(ISalable item, Farmer farmer, int amt, ItemStockInformation _)
         {
             bool found = false;
             for (int i = 0; i < purchased.Count; i++)

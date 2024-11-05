@@ -424,7 +424,6 @@ namespace JojaExpress
                         SalePrice = 10000,
                         MenuSpriteIndex = 0,
                         UpgradeLevel = -1,
-                        ApplyUpgradeLevelToDisplayName = false,
                         CanBeLostOnDeath = true,
                         AttachmentSlots = -1,
                         ConventionalUpgradeFrom = "",
