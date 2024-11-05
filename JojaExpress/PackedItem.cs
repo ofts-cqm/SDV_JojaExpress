@@ -108,6 +108,13 @@ namespace JojaExpress
             }
         }
 
+        public override bool canStackWith(ISalable other)
+        {
+            if(!base.canStackWith(other)) return false;
+            if(other is not PackedItem packed) return false;
+            return levelPacked == packed.levelPacked && itemPacked.Equals(packed.itemPacked);
+        }
+
         public void AdjustItemData()
         {
             ParsedItemData? data = new PackedItemDefinition().GetData(ItemId);
