@@ -1,7 +1,7 @@
 {
   "Name": "Joja Express",
   "Author": "OFTS_CQM",
-  "Version": "1.0.0",
+  "Version": "1.1.0",
   "Description": "Do you like online shopping? I LOVE online shopping --- Joja Online Store Department Manager",
   "UniqueID": "ofts.jojaExp",
   "EntryDll": "JojaExpress.dll",

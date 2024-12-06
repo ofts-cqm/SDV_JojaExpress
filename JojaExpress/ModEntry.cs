@@ -130,8 +130,8 @@ namespace JojaExpress
                 bool success = mobileMenu.AddApp(Helper.ModRegistry.ModID, "Joja Express", PlayerInteractionHandler.handlePhone, appIcon);
                 Monitor.Log($"loaded phone app successfully: {success}", LogLevel.Info);
                 PlayerInteractionHandler.Api = mobileMenu;
-                MobilePhoneRender.init(mobileMenu);
             }
+            MobilePhoneRender.init(mobileMenu);
 
             var spaceCore = Helper.ModRegistry.GetApi<ISpaceCoreAPI>("spacechase0.SpaceCore");
             if (spaceCore == null)
@@ -274,7 +274,7 @@ namespace JojaExpress
         public bool EnableJOLN { get; set; } = true;
         public string[] WholeSaleIds { get; set; } = new[] 
         {
-            "I388", "I390", "C-74", "I176", "I174", "I180", "I182", "I178", "I442", "C-15", "C-19" 
+            "C-16", "C-74", "I176", "I174", "I180", "I182", "I178", "I442", "C-15", "C-19" 
         };
     }
 

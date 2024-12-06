@@ -9,13 +9,13 @@ namespace JojaExpress
     {
         public static Texture2D background, frame;
         public static string bgID = "";
-        public static IMobilePhoneApi Api;
+        public static IMobilePhoneApi? Api;
         public static IModContentHelper helper;
         public static bool old_rotated = false;
         public static List<IRenderPack> protrait = new(), landscape = new();
         public static bool splitBySpace = true;
 
-        public static void init(IMobilePhoneApi Api)
+        public static void init(IMobilePhoneApi? Api)
         {
             MobilePhoneRender.Api = Api;
             helper = ModEntry._Helper.ModContent;

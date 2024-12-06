@@ -22,7 +22,7 @@ namespace JojaExpress
         public Action<int> afterNotification;
         public string[] notificationString = { "", "", "", ""};
 
-        public void _fillStockInfo(Dictionary<ISalable, ItemStockInformation> stock)
+        public void _fillStockInfo(Dictionary<ISalable, ItemStockInformation> stock, bool addRecipe, bool addPacked)
         {
             foreach (KeyValuePair<ISalable, ItemStockInformation> item in stock)
             {
@@ -32,6 +32,10 @@ namespace JojaExpress
                     if (Game1.player.knowsRecipe(item.Key.Name)) continue;
                     item.Key.Stack = 1;
                 }
+
+                if (item.Key.IsRecipe && !addRecipe) continue;
+                if (item.Key is PackedItem && !addPacked) continue;
+
                 if (stockInfo.Stock != 0) forSale.Add(item.Key, item.Value);
             }
         }

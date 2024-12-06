@@ -42,7 +42,7 @@ namespace JojaExpress
 
             forSale = new();
             purchased = new();
-            _fillStockInfo(ShopBuilder.GetShopStock(shopId, shopData));
+            _fillStockInfo(ShopBuilder.GetShopStock(shopId, shopData), shopId.Contains("joln"), shopId.Contains("jojaWhole"));
             currentList = new(forSale);
             InitClickableComponents();
             _updatePosition();

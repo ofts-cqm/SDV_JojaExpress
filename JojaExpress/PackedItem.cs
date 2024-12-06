@@ -23,6 +23,9 @@ namespace JojaExpress
         [XmlElement("itemPacked")]
         public readonly NetObjectList<Item> itemPacked = new();
 
+        [XmlElement("itemFilled")]
+        public readonly NetBool itemFilled = new(false);
+
         [XmlIgnore]
         public static PackedItemDefinition definition = new();
 
@@ -83,24 +86,7 @@ namespace JojaExpress
             _qualifiedItemId = "(JOJAEXP.PI)" + itemId;
             if (levelPacked != -1) return;
             
-            if (QualifiedItemId == "(JOJAEXP.PI)_ofts.jojaExp.item.package.global")
-            {
-                Dictionary<string, int> dic = ModEntry.tobeReceived[0];
-                foreach(KeyValuePair<string, int> p in dic)
-                {
-                    Item? sampleItem;
-                    if (p.Key.StartsWith("rcp"))
-                    {
-                        sampleItem = ItemRegistry.Create(p.Key[3..]);
-                        sampleItem.isRecipe.Value = true;
-                    } else sampleItem = ItemRegistry.Create(p.Key);
-                    sampleItem.Stack = p.Value;
-                    itemPacked.Add(sampleItem);
-                }
-                if (ModEntry.tobeReceived.Count > 1) ModEntry.tobeReceived.RemoveAt(0);
-                if (!Context.IsMainPlayer) ModEntry._Helper.Multiplayer.SendMessage(1, "ofts.jojaExp.tobeReceivedPoped");
-            }
-            else
+            if (QualifiedItemId != "(JOJAEXP.PI)_ofts.jojaExp.item.package.global")
             {
                 LevelPacked = 0;
                 AdjustItemData();

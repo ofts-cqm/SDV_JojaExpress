@@ -25,6 +25,35 @@ namespace JojaExpress
                     ModEntry.tobeReceived.RemoveAt(0);
                     if (!Context.IsMainPlayer) ModEntry._Helper.Multiplayer.SendMessage(1, "ofts.jojaExp.tobeReceivedPoped");
                 }
+                else if (item is PackedItem packed && packed.QualifiedItemId == "(JOJAEXP.PI)_ofts.jojaExp.item.package.global" && !packed.itemFilled.Value)
+                {
+                    Dictionary<string, int> dic = ModEntry.tobeReceived[0];
+                    foreach (KeyValuePair<string, int> p in dic)
+                    {
+                        Item? sampleItem;
+                        if (p.Key.StartsWith("rcp"))
+                        {
+                            sampleItem = ItemRegistry.Create(p.Key[3..]);
+                            sampleItem.isRecipe.Value = true;
+                            sampleItem.Stack = p.Value;
+                            packed.itemPacked.Add(sampleItem);
+                            continue;
+                        }
+
+                        int stack = p.Value;
+                        while (stack > 0)
+                        {
+                            sampleItem = ItemRegistry.Create(p.Key);
+                            sampleItem.Stack = stack;
+                            stack -= sampleItem.Stack;
+                            packed.itemPacked.Add(sampleItem);
+                        }
+                    }
+
+                    packed.itemFilled.Value = true;
+                    if (ModEntry.tobeReceived.Count > 1) ModEntry.tobeReceived.RemoveAt(0);
+                    if (!Context.IsMainPlayer) ModEntry._Helper.Multiplayer.SendMessage(1, "ofts.jojaExp.tobeReceivedPoped");
+                }
             }
         }
 

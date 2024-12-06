@@ -321,7 +321,7 @@ namespace JojaExpress
                         IgnoreShopPriceModifiers = false,
                         PriceModifiers = new() { }
                     });
-                });
+                }, priority: AssetEditPriority.Late);
             }
             else if (e.NameWithoutLocale.IsEquivalentTo("Data/mail"))
             {
@@ -421,7 +421,7 @@ namespace JojaExpress
                         Description = "[LocalizedText JojaExp\\string:descrip_jpad]",
                         Texture = "JojaExp/assets/JPad",
                         SpriteIndex = 1,
-                        SalePrice = 10000,
+                        SalePrice = 500,
                         MenuSpriteIndex = 0,
                         UpgradeLevel = -1,
                         CanBeLostOnDeath = true,
